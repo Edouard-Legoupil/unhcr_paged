@@ -33,6 +33,9 @@
     font-size: small;
     font-size-adjust: 0.45;
     color: #666666;
+    background-image: url('headerline_triangle_left.svg');
+    background-repeat: no-repeat;
+    background-position: top left, -20px 56px, bottom right;
    /* border-bottom: 1px solid rgba(0,0,0,0.25); */
   }
   @bottom-left {
@@ -82,6 +85,9 @@
     font-size: small;
     font-size-adjust: 0.45;
     color: #666666;
+    background-image: url('headerline_triangle_right.svg');
+    background-repeat: no-repeat;
+    background-position: top left, -20px 56px, bottom right;
    /* border-bottom: 1px solid rgba(0,0,0,0.25); */
   }
 
@@ -118,13 +124,9 @@
 @page :first {
 
   margin: 0 0 0 0;
-
   background-color: #ffffff;
-
   background-image:
-
     url('unhcr-visibility-horizontal.svg'), url('headerline_triangle.svg'), url('back.png');
-
   background-repeat: no-repeat, no-repeat, no-repeat;
   background-position: top left, -20px 56px, bottom right;
   background-size: 40%, 110%, 657px 768px;
@@ -201,7 +203,7 @@ h1 {
 .title {
     text-align: right;
     color: #ffffff;
-    font-size: 34pt;
+    font-size: 36pt;
     font-weight: bold;
     /*transform: scale(1, 2.2);
     transform-origin: top;*/
@@ -213,7 +215,7 @@ h1 {
 .author {
     color: #F5C205;
     text-align: right;
-    font-size: 12pt;
+    font-size: 20pt;
     text-transform: none;
     bookmark-level: none;
   }
@@ -284,13 +286,7 @@ p.abstract {
   left: 0 /* ou 10%, 20% si tu préfères */;
 }
 
-/* for code chunk  */
-.pre {
-  font-size: 10pt;
- /* page-break-inside: avoid; */
-  padding-left: 2mm;
-  border-left: 2pt solid #785963;
-  }
+
 
 /* reset page numbering after front matter */
 .front-matter-container+.level1 h1 {

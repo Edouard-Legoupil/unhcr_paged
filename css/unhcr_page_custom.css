@@ -26,29 +26,69 @@ a[href^="http"]:not([class="uri"])::after {
 }
 
 /* TOC, LOT, LOF */
+
+
+.toc {
+    page-break-before: right;
+    page: toc;
+    border-left: 1mm solid #0072bc;
+    padding-left: 4mm;
+   /*
+    text-transform: uppercase;*/
+  }
+
+
+.toc::before {
+    content: string(magazine);
+    display: block;
+    position: fixed;
+    top: 20mm;
+    text-transform: uppercase;
+    font-size: 30pt;
+    font-weight: 900;
+  }
+ /**/
 .toc ul, .lot ul, .lof ul {
   list-style: none;
   padding-left: 0;
   overflow-x: hidden;
+/*   width: 60%;
+  margin-left: 15mm;
+  padding: 4mm 0 4mm 10mm;
+  margin-top: 55mm;
+  float: right;*/
 }
+
+.toc li:first-of-type {
+    padding-top: 4mm;
+}
+
 .toc li li {
+  padding-top: 2mm;
+  padding-bottom: 2mm;
   padding-left: 1em;
 }
+
+
+
 .toc a, .lot a, .lof a {
   text-decoration: none;
   background: white;
   padding-right: .33em;
 }
+
 .toc a::after, .lot a::after, .lof a::after {
   /* content: leader(dotted) target-counter(attr(href), page); */
   content: target-counter(attr(href), page);
   float: right;
   background: white;
 }
+
 .toc a.front-matter-ref::after, .lot a.front-matter-ref::after, .lof a.front-matter-ref::after {
   /* content: leader(dotted) target-counter(attr(href), page, lower-roman); */
   content: target-counter(attr(href), page, lower-roman);
 }
+
 .toc .leaders::before, .lot .leaders::before, .lof .leaders::before {
   float: left;
   width: 0;
@@ -92,12 +132,19 @@ blockquote {
 img {
   max-width: 100%;
 }
-pre {
-  padding: 1em;
-}
+
+
+/* code box for code chunk  */
+
 pre[class] {
+  font-size: 9pt;
   background: #f9f9f9;
+  padding: 1em;
+  padding-left: 2mm;
+  border-left: 1pt solid #785963;
+ /* page-break-inside: avoid; */
 }
+
 table {
   margin: auto;
   border-top: 1px solid #666;
