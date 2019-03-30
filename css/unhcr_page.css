@@ -117,38 +117,17 @@
 /* Report first page */
 @page :first {
 
-  margin: 25mm 0 0 0;
+  margin: 0 0 0 0;
 
   background-color: #ffffff;
 
   background-image:
-    url('unhcr-visibility-horizontal.svg'),
-	url('headerline.svg'),
-    radial-gradient(36px at 28mm 77mm , #0072bc 0%, #DEA642 30px, black 32px, #ab8864 34px, black 35px, rgba(255,255,255,0) 36px),
-	linear-gradient(rgba(0, 0, 0, 0) 220mm, rgba(17, 22, 28, 0.8) 240mm),
-	url('back.png');
 
-  background-repeat: no-repeat;
-  background-position: top left,-18px 47px, bottom right,bottom right,bottom right,bottom right;
-  background-size: 300px,700px, cover, cover, 657px 768px;
+    url('unhcr-visibility-horizontal.svg'), url('headerline_triangle.svg'), url('back.png');
 
-  /*margin: 25mm 0 0 0;
-  background-color: #ffffff;
-   background-image:
-   radial-gradient(36px at 28mm 77mm ,
-                    #0072bc 0%,
-                    #0072bc 30px,
-                    black 32px,
-                    #ab8864 34px,
-                    black 35px,
-                    rgba(255,255,255,0) 36px)
-        linear-gradient(rgba(0, 0, 0, 0) 220mm, rgba(17, 22, 28, 0.8) 240mm),
-     url('header_page.png'),
-        linear-gradient(#0072bc 74mm, #ffffff 74mm);
-  background-repeat: no-repeat;
-  background-position: bottom right;
-  filter: blur(0.5px) sepia(75%) saturate(80%);
-  background-size: cover, cover, 657px 768px, cover;*/
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: top left, -20px 56px, bottom right;
+  background-size: 40%, 110%, 657px 768px;
 
   @top-left {
     background-image:
