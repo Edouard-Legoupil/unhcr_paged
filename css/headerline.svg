@@ -24,20 +24,6 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     transform="translate(219.52856,-50.181549)"
-     id="layer1">
-    <path
-       id="path902"
-       d="m -208.68064,74.523215 20.90208,-0.264583 6.35,6.614584"
-       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       id="path904"
-       d="m -181.42856,80.873215 6.35,-6.746875"
-       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-    <path
-       id="path906"
-       d="M -175.07856,74.12634 H 159.35477"
-       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
-  </g>
+  <path id="lineAB" d="M0 27 L450 27 L50 27 L40 37 L40 37 L30 27 Z" stroke="#ffffff"
+  stroke-width="1" fill="#ffffff" />
 </svg>
