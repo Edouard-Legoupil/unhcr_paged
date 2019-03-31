@@ -1,0 +1,16 @@
+<svg width="383.11667" height="37.041668" xmlns="http://www.w3.org/2000/svg">
+ <metadata id="metadata5">image/svg+xml</metadata>
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="39.041668" width="385.11667" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <path stroke="#ffffff" id="svg_1" d="m64.155101,30.448441l5.478373,-6.559964l-5.478373,6.559964z" stroke-width="0.4" fill="#fff"/>
+  <line stroke="#0071bb" stroke-linecap="null" stroke-linejoin="null" id="svg_2" y2="23.829952" x2="14" y1="23.829952" x1="314" fill-opacity="null" stroke-width="0.4" fill="none"/>
+  <line stroke="#0071bb" transform="rotate(45 317.0585327148438,26.892305374145515) " stroke-linecap="null" stroke-linejoin="null" id="svg_5" y2="26.892306" x2="321.351369" y1="26.892306" x1="312.760791" fill-opacity="null" stroke-opacity="null" stroke-width="0.4" fill="none"/>
+  <line stroke="#0071bb" transform="rotate(135 322.8083190917969,26.892305374145533) " stroke-linecap="null" stroke-linejoin="null" id="svg_6" y2="26.892306" x2="327.101092" y1="26.892306" x1="318.510514" fill-opacity="null" stroke-opacity="null" stroke-width="0.4" fill="none"/>
+  <line stroke="#0071bb" stroke-linecap="null" stroke-linejoin="null" id="svg_7" y2="23.829952" x2="326" y1="24" x1="370" fill-opacity="null" stroke-width="0.4" fill="none"/>
+ </g>
+</svg>

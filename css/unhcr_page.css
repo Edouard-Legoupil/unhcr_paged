@@ -122,31 +122,15 @@
   background-color: #ffffff;
 
   background-image:
-    /*radial-gradient(36px at 28mm 77mm , #0072bc 0%, #DEA642 30px, black 32px, #ab8864 34px, black 35px, rgba(255,255,255,0) 36px),
-    linear-gradient(rgba(0, 0, 0, 0) 220mm, rgba(17, 22, 28, 0.8) 240mm),*/
-    url('unhcr-visibility-horizontal.svg'), url('headerline_triangle.svg'), url('back.png');
+
+    url('unhcr-visibility-horizontal.svg'), url('headerline_triangle_first.svg'), url('back.png'); /* earlier the url, higher in the layer of the page */
 
   background-repeat: no-repeat, no-repeat, no-repeat;
-  background-position: top left, -20px 56px, bottom right;
-  background-size: 40%, 110%, 657px 768px;
+  background-position: top left, 0px 56px, bottom right;
+  background-size: 42%, 100%, 657px 772px; /* 42% can be adjustded here, it is in my best judgement for UNHCR logo */
 
-  /*margin: 25mm 0 0 0;
-  background-color: #ffffff;
-   background-image:
-   radial-gradient(36px at 28mm 77mm ,
-                    #0072bc 0%,
-                    #0072bc 30px,
-                    black 32px,
-                    #ab8864 34px,
-                    black 35px,
-                    rgba(255,255,255,0) 36px)
-        linear-gradient(rgba(0, 0, 0, 0) 220mm, rgba(17, 22, 28, 0.8) 240mm),
-     url('header_page.png'),
-        linear-gradient(#0072bc 74mm, #ffffff 74mm);
-  background-repeat: no-repeat;
-  background-position: bottom right;
-  filter: blur(0.5px) sepia(75%) saturate(80%);
-  background-size: cover, cover, 657px 768px, cover;*/
+
+
 
   @top-left {
     content: none;
@@ -158,6 +142,61 @@
     content: none !important;
   }
 }
+
+@page :left {
+
+  margin: 0 0 0 0;
+
+  background-color: #ffffff;
+
+  background-image:
+
+    url('headerline_triangle.svg');
+
+  background-repeat: no-repeat;
+  background-position: 0px 20px;
+  background-size: 100%;
+
+
+  @top-left {
+    content: none;
+  }
+  @top-right {
+    content: none;
+  }
+  @bottom-right {
+    content: none !important;
+  }
+}
+
+@page :right {
+
+  margin: 0 0 0 0;
+
+  background-color: #ffffff;
+
+  background-image:
+
+    url('headerline_triangle_r.svg'); /*headliner in reverse for right sided pages*/
+	
+
+  background-repeat: no-repeat;
+  background-position: 0px 20px;
+  background-size: 100%;
+  
+
+
+  @top-left {
+    content: none;
+  }
+  @top-right {
+    content: none;
+  }
+  @bottom-right {
+    content: none !important;
+  }
+}
+
 
 /* Front matter */
 @page frontmatter:left {
