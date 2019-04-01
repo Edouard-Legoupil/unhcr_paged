@@ -17,18 +17,27 @@ output:
 
 
 ```{r setup, include=FALSE, echo=TRUE, warning=FALSE}
-pacman::p_load('dplyr', 'tidyr', 'gapminder',
-               'ggplot2',  'ggalt',
-               'forcats', 'R.utils', 'png', 
-               'grid', 'ggpubr', 'scales',
-               'bbplot', 'knitr', 'pander')
-options(scipen = 999)
+using <- function(...) {
+    libs <- unlist(list(...))
+    req <- unlist(lapply(libs,require,character.only = TRUE))
+    need <- libs[req == FALSE]
+    if (length(need) > 0) { 
+        install.packages(need)
+        lapply(need,require,character.only = TRUE)
+    }
+}
+
+using('tidyverse','gganimate','gghighlight','ggpubr', 'dplyr', 'tidyr', 'gapminder', 'ggplot2',  'ggalt', 'forcats', 'R.utils', 'png', 'grid', 'ggpubr', 'scales', 'bbplot', 'markdown', 'pander', 'ISOcodes', 'wbstats', 'sf', 'rnaturalearth', 'rnaturalearthdata', 'ggspatial')
+
+options(scipen = 999) # turn-off scientific notation like 1e+48
 ```
 
 
 This R cookbook is designed to make the process of creating publication-ready graphics and reports with UNHCR style a more __reproducible process__. The cookbook aims as well at making it easier for people new to R to create graphics. It implements a specific theme (using `ggplot2` R library) and report template (using `pagedown`  R library). 
 
-The cookbook below should hopefully help anyone who wants to make advanced graphics and gain efficiency in the generation of statistical reports. All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be r-used. 
+The cookbook below should hopefully help anyone who wants to make advanced graphics and gain efficiency in the generation of statistical reports. All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be re-used. 
+
+The cookbook covers basic use cases. If one has to deal to with complex survey datasset, based on a population sample, we are advising to look at the dedicated package [KoboloadeR](https://unhcr.github.io/koboloadeR/docs/).
 
 
 This document has been largely inspired by the [BBC cookbook](https://bbc.github.io/rcookbook/).
@@ -46,27 +55,70 @@ Reproducibility is key in data analysis:
  
  * It allows for peer review and/or can help peers to learn from what is presented.
  
- 
+ The entry point to analysis reproducibility is to have each step documented through scripts, rather than using _point and click_ software interface. R is a very powerfull language for this:
 
-## Load all the libraries you need
+ 1. It’s open source (i.e. it can be customised to accommodate specific needs) and free to use (i.e. not only saving financial resources for core humanitarian activities but also avoiding there long and cumbersome software procurement processes);
+
+ 2. It is now an industry-standard in data science and data mining (for instance it is now integrated per default in recent versions of Microsoft SQL Server,);
+
+ 3. It has a strong community, which leverages package (i.e. logic & workflow) development and plenty of tutorial material and user group;
+ 
+ 4. It covers the entire analysis workflow: from data import, data tidying, data reshaping, visualisation with chart, modelisation and generation of report to communicate results. 
+
+![__Diagram:__ Data Science Workflow](data-science.png)
+ 
+This cookbook does not aim at replacing the numerous books available on data science, like the [R for Data Science](https://r4ds.had.co.nz)  
+ 
+ 
+In November 2018, the first HumanitaRian-useR-group took place. An online [skype group](https://join.skype.com/qYBKC5q3wKp4), with over 150 members at the time of writing is openly accessible and tutorial based on humanitarian situations are published on a [blog](http://humanitarian-user-group.github.io/).  
+
+## Chart to convey "_stories_"
+
+Effective chart are first those that __support a message__. From the same dataset a multiplicity of chart can be produced. The best chart is the one that present in the most powerful way the message that you want to pass-on and the story you want to tell. 
+
+Simples rules can help to achived this:
+
+ * __Outline the message__: Always use the main conclusion you want to draw within the title of the chart, use the subtitle to present the data that you have used in the chart. annotation in the chart can also help explaining why the chart is an evidence of the message you present.
+ 
+ * __Do keep the chart as simple as possible__. Edward Tufte, a statistician, said “_Graphical elegance is often found in simplicity of design and complexity of data._” A common mistake we all make with charts is overdressing them with unnecessary elements. The usual suspects are excess color, graphical clutter and abuse of special effects. Displaying too many decimal places in our values is another one to watch out for. Details like these won’t impress anyone, but decluttering your charts will.
+ 
+ * __Focus on legibility__: For bar graph presenting categories, do use a horizontal bar graph and arrange data from greatest to least in descending order. Use color to communicate information and not for decoration. Too many colors can confuse and disorient. When designing a graph, color can be both your friend and your enemy. Depending on how we use it, it can either gracefully highlight data and show a change, or create visual overload and confuse the audience. 
+ 
+ * __Reshape first your data__: Don’t use more than six colors or six different categories within the same chart: human brain cannot process more than this. Extra decimal places look impressive and imply accuracy, but they’re often pointless. So, take a step back and round numbers off before plotting. Overstating the numerical precision of your data by showing too many decimal places can make your chart seem accurate, but this specificity is just misleading. Even when you don’t exaggerate the precision of your data, and your numbers are genuinely accurate, overloading your audience with such detail is often useless
+
+
+By using this cookbook, you can benefit from a simple and lean style and focus on your data, message and story-telling, rather than wasting precious time on chart beautification and report design. 
+
+
+
+# Set up your environment
 
 We'll get to how you can put together the various elements of these graphics, but **let's get the admin out of the way first...**
 
-A few of the steps in this cookbook - and to create charts in R in general - require certain packages to be installed and loaded. So that you do not have to install and load them one by one, you can use the `p_load` function in the `pacman` package to load them all at once with the following code. 
+## Software & Libraries
+
+You will need to first install [R](https://www.r-project.org/) and [R sudio](https://www.rstudio.com/products/rstudio/download/). The next step could be to download this repository and re-run the Rmd file line by line and see the results of each instructions to familiarise yourself with the code.
+
+A few of the steps in this cookbook - and to create charts in R in general - require certain packages to be installed and loaded. So that you do not have to install and load them one by one, you can use the `using` function to load them all at once with the following code. 
 
 ```{r , eval=FALSE}
-# This line of code installs the pacman page if you do not have it installed 
-# - if you do, it simply loads the package
-if(!require(pacman))install.packages("pacman")
-pacman::p_load('dplyr', 'tidyr', 'gapminder', 'ggplot2',  'ggalt',
-               'forcats', 'R.utils', 'png', 'grid', 'ggpubr', 'scales', 'bbplot')
+## Getting all necessary package
+using <- function(...) {
+    libs <- unlist(list(...))
+    req <- unlist(lapply(libs,require,character.only = TRUE))
+    need <- libs[req == FALSE]
+    if (length(need) > 0) { 
+        install.packages(need)
+        lapply(need,require,character.only = TRUE)
+    }
+}
+using('tidyverse','gganimate','gghighlight','ggpubr', 'dplyr', 'tidyr', 'gapminder', 'ggplot2',  'ggalt', 'forcats', 'R.utils', 'png', 'grid', 'ggpubr', 'scales', 'bbplot', 'markdown', 'pander', 'ISOcodes', 'wbstats', 'sf', 'rnaturalearth', 'rnaturalearthdata', 'ggspatial')
 ```
 
 
-The style is based first on the function: `unhcr_style()`. The `unhcr_style()` function essentially modifies certain arguments in the `theme` function of `ggplot2`.
+UNHCR style is delivered through the function: `unhcr_style()`. This function essentially modifies certain arguments in the `theme` function of `ggplot2`.
 
 ``` {r }
-
 unhcr_style <- function() {
   font <- "Lato"
   ggplot2::theme(
@@ -84,11 +136,11 @@ unhcr_style <- function() {
   legend.background = ggplot2::element_blank(),
   legend.title = ggplot2::element_blank(),
   legend.key = ggplot2::element_blank(),
-  legend.text = ggplot2::element_text(family=font, size=18, color = "#222222"),
+  legend.text = ggplot2::element_text(family=font, size=13, color = "#222222"),
 
 #This sets the text font, size and colour for the axis test, as well as setting the margins and removes lines and ticks. In some cases, axis lines and axis ticks are things we would want to have in the chart
   axis.title = ggplot2::element_blank(),
-  axis.text = ggplot2::element_text(family=font, size=18, color = "#222222"),
+  axis.text = ggplot2::element_text(family=font, size=13, color = "#222222"),
   axis.text.x = ggplot2::element_text(margin=ggplot2::margin(5, b = 10)),
   axis.ticks = ggplot2::element_blank(),
   axis.line = ggplot2::element_blank(),
@@ -103,10 +155,9 @@ unhcr_style <- function() {
 
 #This sets the panel background for facet-wrapped plots to white, removing the standard grey ggplot background colour and sets the title size of the facet-wrap title to font size 22
   strip.background = ggplot2::element_rect(fill = "white"),
-  strip.text = ggplot2::element_text(size  = 16,  hjust = 0)
+  strip.text = ggplot2::element_text(size  = 13,  hjust = 0)
   )
 }
-
 ``` 
 
 
@@ -141,8 +192,45 @@ left_align <- function(plot_name, pieces){
 
 ```
 
+Anotherfunction, `format_si()`, can be also installed to nicely format numbers
 
-## Report template with pagedown
+``` {r format_si, message=FALSE, warning=FALSE,}
+## a little help function to better format numbers
+format_si <- function(...) {
+  function(x) {
+    limits <- c(1e-24, 1e-21, 1e-18, 1e-15, 1e-12,
+                1e-9,  1e-6,  1e-3,  1e0,   1e3,
+                1e6,   1e9,   1e12,  1e15,  1e18,
+                1e21,  1e24)
+    prefix <- c("y",   "z",   "a",   "f",   "p",
+                "n",   "",   "m",   " ",   "k",
+                "M",   "G",   "T",   "P",   "E",
+                "Z",   "Y")
+
+    # Vector with array indices according to position in intervals
+    i <- findInterval(abs(x), limits)
+
+    # Set prefix to " " for very small values < 1e-24
+    i <- ifelse(i == 0, which(limits == 1e0), i)
+
+    paste(format(round(x/limits[i], 1),
+                 trim = TRUE, scientific = FALSE, ...),
+          prefix[i])
+  }
+}
+```
+
+
+
+
+## Report template
+
+Markdown is a simple formatting language designed to make authoring content easy for everyone. Rather than write in complex markup code (e.g. HTML or LaTex), you write in plain text with formatting cues.
+
+[R Markdown](https://rmarkdown.rstudio.com/) allows to weave together narrative text and code to produce elegantly formatted output. Within an R Markdown file, R Code Chunks can be embedded with the native Markdown syntax for fenced code regions. 
+
+An R Markdown document can be then rendered into the final output format (for instance HTML, but also directly into word or PDF). R Markdown documents contains a metadata section that includes title, author, and date information as well as options for customizing output. 
+
 
 [Pagedown](https://github.com/rstudio/pagedown) is a package that allows to transform an R Markdown  file into an htlm files, directly paginated (with CSS for Print) to be saved as PDF. With Pagedown, you only need a modern web browser (e.g., Google Chrome) to generate PDF.
 
@@ -150,43 +238,112 @@ This package requires a recent version of Pandoc (>= 2.2.3). If you use RStudio,
 
 A dedicated template - used in this document - allows to implement quickly and directly UNHCR branding.
 
+## Prepare some data 
 
-## Chart to convey "_stories_"
+Last Let's now download & slighlty tidy the data from UNHCR popstat API in order to use them in the tutorial
 
-Effective chart are first those that support a message. From the same dataset a multiplicity of chart can be produced. The best chart is the one that present in the most powerful way the message that you want to pass-on. 
+```{r  cache = TRUE, message=FALSE, warning=FALSE}
+# Time series
+url <- paste( 'http://popstats.unhcr.org/en/time_series.csv') 
+download.file(url, destfile = "unhcr_popstats_export_time_series_all_data.csv" )
+time_series <- read.csv("unhcr_popstats_export_time_series_all_data.csv", skip = 3) 
 
-Simples rules can help to achived this:
+## Rename the country and
+names(time_series)[2] <- "Country"
 
- * __Outline the message__: Always use the main conclusion you want to draw within the title of the chart, use the subtitle to present the data that you have used in the chart. annotation in the chart can also help explaining why the chart is an evidence of the message you present.
+## Make sure Value is numeric
+time_series$Value <- as.integer(as.character(time_series$Value))
+
+## Check what population type we have there and subset accordingly
+#levels(time_series$Population.type)
+time_series2 <- time_series[ time_series$Population.type %in% c("Refugees (incl. refugee-like situations)", "Internally displaced persons" ), ]
+## Re create levels for filtered Population.type
+time_series$Population.type <- as.factor(as.character(time_series$Population.type))
+
+## Get region name
+url <- paste( 'https://pkgstore.datahub.io/core/country-codes/country-codes_csv/data/3b9fd39bdadd7edd7f7dcee708f47e1b/country-codes_csv.csv') 
+download.file(url, destfile = "countrycode.csv" )
+countrycode <- read.csv("countrycode.csv") 
+#names(countrycode)
+
+### Rewrite country name 
+time_series$ctryiso <- as.character(time_series$Country)
+time_series$ctryiso[time_series$Country == "Bonaire"] <- "Bonaire, Sint Eustatius and Saba" 
+time_series$ctryiso[time_series$Country == "Central African Rep."] <- "Central African Republic" 
+time_series$ctryiso[time_series$Country == "China, Hong Kong SAR"] <- "China, Hong Kong Special Administrative Region" 
+time_series$ctryiso[time_series$Country == "China, Macao SAR"] <- "China, Macao Special Administrative Region"  
+time_series$ctryiso[time_series$Country == "C\xf4te d'Ivoire"] <- "Côte d'Ivoire" 
+time_series$ctryiso[time_series$Country == "Cura\xe7ao"] <- "Curaçao" 
+time_series$ctryiso[time_series$Country == "Czech Rep."] <- "Czechia" 
+time_series$ctryiso[time_series$Country == "Dem. Rep. of the Congo"] <- "Democratic Republic of the Congo" 
+time_series$ctryiso[time_series$Country == "Dominican Rep."] <- "Dominican Republic" 
+time_series$ctryiso[time_series$Country == "Iran (Islamic Rep. of)"] <- "Iran (Islamic Republic of)" 
+time_series$ctryiso[time_series$Country == "Lao People's Dem. Rep."] <- "Lao People's Democratic Republic" 
+time_series$ctryiso[time_series$Country == "Rep. of Korea"] <- "Republic of Korea" 
+time_series$ctryiso[time_series$Country == "Dem. People's Rep. of Korea"] <- "Democratic People's Republic of Korea" 
+time_series$ctryiso[time_series$Country == "Rep. of Moldova"] <- "Republic of Moldova"  
+time_series$ctryiso[time_series$Country == "Serbia and Kosovo (S/RES/1244 (1999))"] <- "Serbia" 
+time_series$ctryiso[time_series$Country == "Syrian Arab Rep."] <- "Syrian Arab Republic" 
+time_series$ctryiso[time_series$Country == "United Rep. of Tanzania"] <- "United Republic of Tanzania" 
+time_series$ctryiso[time_series$Country == "Holy See (the)"] <- "Holy See (Vatican City State)" 
+time_series$ctryiso[time_series$Country == "Réunion"] <- "Reunion" 
+time_series$ctryiso[time_series$Country == "Saint-Pierre-et-Miquelon"] <- "Saint Pierre and Miquelon" 
+time_series$ctryiso[time_series$Country == "US Virgin Islands"] <- "Virgin Islands, U.S." 
+time_series$ctryiso[time_series$Country == "Wallis and Futuna Islands "] <- "Wallis and Futuna" 
+time_series$ctryiso[time_series$Country == "United Kingdom"] <- "United Kingdom of Great Britain and Northern Ireland"
+
+time_series <- merge(x = time_series , by.x = "ctryiso", all.x = TRUE, y = countrycode , by.y = "official_name_en" )
  
- * __Do keep the chart as simple as possible__. Edward Tufte, a statistician, said “_Graphical elegance is often found in simplicity of design and complexity of data._” 
- 
- * __Focus on legibility__: For bar graph presenting categories, do use a horizontal bar graph and arrange data from greatest to least in descending order. 
- 
- * __Reshape first your data__:Don’t use more than six colors or six different categories within the same chart: human brain cannot process more than this. 
 
+# Population, GDP & GNP per Capita from WorldBank
+wb_data <- wb( indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD", "NY.GDP.PCAP.CD", "NY.GNP.PCAP.CD"),
+               startdate = 1951, enddate = 2017, return_wide = TRUE)
+# Rename columns for later merging
+names(wb_data)[1] <- "ISO3166.1.Alpha.3"
+names(wb_data)[2] <- "Year"
 
-By using this cookbook, you can benefit from a simple and lean style and focus on your data and message, rather than wasting time on chart beautification and report design. 
+## Getting world map for mapping
+world <- ne_countries(scale = "small", returnclass = "sf")
+centroids <- st_transform(world$geometry, '+init=epsg:3857') %>%  
+  ## Reprojected in order to get centroid
+  st_centroid() %>% 
+  # this is the crs from d, which has no EPSG code:
+  st_transform(., '+init=epsg:4326') %>%
+  # since we want the centroids in long lat:
+  st_geometry()
+world_points <- cbind(world, st_coordinates(centroids))
+
+```
 
 
 # Generate different kind of plots
 
 ## Line chart
 
-```{r message = FALSE}
+
+The following code: 
+
+```{r ,message = FALSE, warning = FALSE}
 #Prepare data
-line_df <- gapminder %>%
-  filter(country == "China") 
+line_df <- time_series2 %>%
+  filter(Population.type  == "Refugees (incl. refugee-like situations)") %>%
+  group_by(Year) %>%
+  summarise(Value2 = sum(Value) ) 
+
+
 #Make plot
-line <- ggplot(line_df, aes(x = year, y = lifeExp)) +
-  
-  geom_line(colour = "#0072bc", size = 1) +
-  
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  unhcr_style() +
-  labs(title = "Living longer",
-       subtitle = "Life expectancy in China 1952-2007")
+line <- ggplot(line_df, aes(x = Year, y = Value2)) +
+  geom_line(colour = "#0072bc", size = 1) + # Here we mention that it will be a line chart
+ # geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+  unhcr_style() + ## Insert UNHCR Style
+  scale_y_continuous(label = format_si()) + ## Format axis number
+  ## and the chart labels
+  labs(title = "More and More refugees",
+       subtitle = "World wide refugee population 1951-2017", 
+       caption = "UNHCR http://popstats.unhcr.org")
 ```
+
+generate this chart:
 
 ```{r echo=FALSE}
 #plot(line)
@@ -195,20 +352,32 @@ ggpubr::ggarrange(left_align(line, c("subtitle", "title")), ncol = 1, nrow = 1)
 
 ## Multiple line chart
 
-```{r}
+
+The following code: 
+
+```{r ,message = FALSE, warning = FALSE}
 #Prepare data
-multiple_line_df <- gapminder %>%
-  filter(country == "China" | country == "United States") 
+multiple_line_df <- time_series %>%
+  filter(Population.type  == "Refugees (incl. refugee-like situations)" & !(is.na(Region.Name))) %>%
+  group_by(Year, Region.Name ) %>%
+  summarise(Value2 = sum(Value) ) 
+
 #Make plot
-multiple_line <- ggplot(multiple_line_df, aes(x = year, y = lifeExp, colour = country)) +
-  geom_line(size = 1) +
+multiple_line <- ggplot(multiple_line_df, aes(x = Year, y = Value2, 
+                                              colour = Region.Name)) + # Adding reference to color
+  geom_line(size = 1) + # Here we mention that it will be a line chart
   geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  scale_colour_manual(values = c("#FAAB18", "#0072bc")) +
-  unhcr_style() +
-  labs(title = "Living longer",
-       subtitle = "Life expectancy in China and the US")
+  scale_y_continuous( label = format_si()) + ## Format axis number
+  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
+  unhcr_style() + ## Insert UNHCR Style
+  ## and the chart labels
+  labs(title = "Refugees Population are not equally spread",
+       subtitle = "World wide refugee population 1951-2017", 
+       caption = "UNHCR http://popstats.unhcr.org")
 ```
 
+
+generate this chart:
 
 ```{r echo=FALSE}
 #plot(multiple_line)
@@ -217,22 +386,42 @@ ggpubr::ggarrange(left_align(multiple_line, c("subtitle", "title")), ncol = 1, n
 
 ## Bar chart
 
-```{r}
+Note that by default, R will display your data in alphabetical order, but arranging it by size instead is simple: just wrap `reorder()` around the `x` or `y` variable you want to rearrange, and specify which variable you want to reorder it by. 
+
+E.g. `x = reorder(Country, Value2)`. Ascending order is the default, but you can change it to descending by wrapping `desc()` around the variable you're ordering by.
+
+The following code: 
+
+```{r ,message = FALSE, warning = FALSE}
 #Prepare data
-bar_df <- gapminder %>%
-  filter(year == 2007 & continent == "Africa") %>%
-  arrange(desc(lifeExp)) %>%
-  head(5)
+bar_df <- time_series %>%
+  filter(Population.type  == "Refugees (incl. refugee-like situations)" & Year == 2016) %>%
+  group_by( Country, Sub.region.Name) %>%
+  summarise(Value2 = sum(Value) )  %>%
+  arrange(desc(Value2)) %>%
+  head(10)
+
 #Make plot
-bars <- ggplot(bar_df, aes(x = country, y = lifeExp)) +
+bars <- ggplot(bar_df, aes(x = reorder(Country, Value2), ## Reordering country by Value
+                           y = Value2)) +
   geom_bar(stat = "identity", 
            position = "identity", 
-           fill = "#0072bc") +
+           fill = "#0072bc") + # here we configure that it will be bar chart
   geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  unhcr_style() +
-  labs(title = "Reunion is highest",
-       subtitle = "Highest African life expectancy, 2007")
+  coord_flip() + # Add `coord_flip()` to make your vertical bars horizontal:
+  unhcr_style() + ## Insert UNHCR Style
+  ## and the chart labels
+  labs(title = "Turkey is by the far the biggest Refugee hosting country",
+       subtitle = "Top 10 Refugee Population per country in 2017", 
+       caption = "UNHCR http://popstats.unhcr.org") +
+  scale_y_continuous( label = format_si()) + ## Format axis number
+  theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
+        panel.grid.major.y = element_blank()) ### changing grid line that should appear
 ```
+
+
+
+Generate this chart:
 
 ```{r echo=FALSE}
 #plot(bars)
@@ -241,34 +430,55 @@ ggpubr::ggarrange(left_align(bars, c("subtitle", "title")), ncol = 1, nrow = 1)
 
 ## Stacked bar chart
 
-```{r}
+The following code: 
+
+```{r ,message = FALSE, warning = FALSE}
 #prepare data
-stacked_df <- gapminder %>% 
-  filter(year == 2007) %>%
-  mutate(lifeExpGrouped = cut(lifeExp, 
-                    breaks = c(0, 50, 65, 80, 90),
-                    labels = c("Under 50", "50-65", "65-80", "80+"))) %>%
-  group_by(continent, lifeExpGrouped) %>%
-  summarise(continentPop = sum(as.numeric(pop)))
-#set order of stacks by changing factor levels
-stacked_df$lifeExpGrouped = factor(stacked_df$lifeExpGrouped, levels = rev(levels(stacked_df$lifeExpGrouped)))
+df1 <- time_series %>%
+  filter(Population.type  == "Refugees (incl. refugee-like situations)" & Year == 2016 & !(is.na(Region.Name))) %>%
+  group_by(Year, Country, ISO3166.1.Alpha.3 ) %>%
+  summarise(Value2 = sum(Value) )
+
+#df1 <- as.data.frame(df1)
+
+# Population, GDP & GNP per Capita from WorldBank
+wb_data <- wb( indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD", "NY.GDP.PCAP.CD", "NY.GNP.PCAP.CD"),
+               startdate = 1951, enddate = 2017, return_wide = TRUE)
+
+names(wb_data)[1] <- "ISO3166.1.Alpha.3"
+names(wb_data)[2] <- "Year"
+df2 <- merge(x = df1, y = wb_data, by = c("ISO3166.1.Alpha.3" ,"Year"), all.x = TRUE)
+df2 <- merge(x = df2, y = countrycode[ ,c("ISO3166.1.Alpha.3", "Region.Name")], by = "ISO3166.1.Alpha.3" , all.x = TRUE)
+df2 <- df2[ !(is.na(df2$Region.Name)) & !(is.na(df2$NY.GNP.PCAP.CD)) , ]
+df2$prop <- df2$Value2 / df2$SP.POP.TOTL
+
+stacked_df1 <- df2 %>%
+  mutate(CountryClass = cut(NY.GNP.PCAP.CD, 
+                              breaks = c(0, 1005, 3955, 12235, 150000),
+                              labels = c("Low-income", "Lower-middle income", "Upper-middle income", "High-income"))) %>%
+  group_by(Region.Name, CountryClass) %>%
+  summarise(Value3 = sum(as.numeric(Value2)))
+
 #create plot
-stacked_bars <- ggplot(data = stacked_df, 
-                       aes(x = continent,
-                           y = continentPop,
-                           fill = lifeExpGrouped)) +
-  geom_bar(stat = "identity", 
-           position = "fill") +
-  unhcr_style() +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_viridis_d(direction = -1) +
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  labs(title = "How life expectancy varies",
-       subtitle = "% of population by life expectancy band, 2007") +
-  theme(legend.position = "top", 
-        legend.justification = "left") +
-  guides(fill = guide_legend(reverse = TRUE))
+stacked_bars <- ggplot(data = stacked_df1, 
+                     aes(x = Region.Name,
+                         y = Value3,
+                         fill = CountryClass)) +
+                geom_bar(stat = "identity", 
+                         position = "fill") +
+                unhcr_style() +
+                scale_y_continuous(labels = scales::percent) +
+                scale_fill_viridis_d(direction = -1) +
+                geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+                labs(title = "High Share of Refugees in Africa are hosted in low-income countries",
+                     subtitle = "% of population by Country classification per Region, 2017", 
+                     caption = "UNHCR http://popstats.unhcr.org - World Bank") +
+                theme(legend.position = "top", 
+                      legend.justification = "left") +
+                guides(fill = guide_legend(reverse = TRUE))
 ```
+
+generate this chart:
 
 ```{r echo=FALSE}
 #plot(stacked_bars)
@@ -287,32 +497,45 @@ Making a grouped bar chart is very similar to making a bar chart.
 
 You just need to change `position = "identity"` to `position = "dodge"`, and set the `fill` aesthetically instead:
 
-```{r}
+The following code: 
+
+```{r ,message = FALSE, warning = FALSE}
 #Prepare data
-grouped_bar_df <- gapminder %>%
-  filter(year == 1967 | year == 2007) %>%
-  select(country, year, lifeExp) %>%
-  spread(year, lifeExp) %>%
-  mutate(gap = `2007` - `1967`) %>%
-  arrange(desc(gap)) %>%
-  head(5) %>%
-  gather(key = year, 
-         value = lifeExp,
-         -country,
-         -gap) 
+grouped_bar_df <- time_series %>%
+    filter(Population.type  == "Refugees (incl. refugee-like situations)")  %>%
+    filter(Year == 2006 | Year == 2016) %>%
+    group_by( Country, Year) %>%
+    summarise(Value2 = sum(Value) )  %>%
+    select(Country, Year, Value2) %>%
+    spread(Year, Value2) %>%
+    mutate(gap = `2016` - `2006`) %>%
+    arrange(desc(gap)) %>%
+    head(10) %>%
+    gather(key = Year, 
+           value = Value2,
+           -Country,
+           -gap) 
   
 #Make plot
 grouped_bars <- ggplot(grouped_bar_df, 
-                       aes(x = country, 
-                           y = lifeExp, 
-                           fill = as.factor(year))) +
+                       aes(x = Country, 
+                           y = Value2, 
+                           fill = as.factor(Year))) +
+  
+  coord_flip() +
   geom_bar(stat = "identity", position = "dodge") +
   geom_hline(yintercept = 0, size = 1, colour = "#333333") +
   unhcr_style() +
   scale_fill_manual(values = c("#0072bc", "#FAAB18")) +
-  labs(title = "We're living longer",
-       subtitle = "Biggest life expectancy rise, 1967-2007")
+  labs(title = "Biggest Increase Population",
+       subtitle = "10 Biggest change in Refugee Population, 2006-2016", 
+       caption = "UNHCR http://popstats.unhcr.org") +
+  scale_y_continuous( label = format_si()) + ## Format axis number
+  theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
+        panel.grid.major.y = element_blank()) ### changing grid line that should appear
 ```
+
+generate this chart:
 
 ```{r echo=FALSE}
 #plot(grouped_bars)
@@ -323,42 +546,156 @@ ggpubr::ggarrange(left_align(grouped_bars, c("subtitle", "title")), ncol = 1, nr
 
 Another way of showing difference is a dumbbell chart:
 
-```{r}
+The following code: 
+
+```{r ,message = FALSE, warning = FALSE}
 library("ggalt")
 library("tidyr")
+
 #Prepare data
-dumbbell_df <- gapminder %>%
-  filter(year == 1967 | year == 2007) %>%
-  select(country, year, lifeExp) %>%
-  spread(year, lifeExp) %>%
-  mutate(gap = `2007` - `1967`) %>%
-  arrange(desc(gap)) %>%
-  head(10)
-#Make plot
-ggplot(dumbbell_df, aes(x = `1967`, xend = `2007`, y = reorder(country, gap), group = country)) + 
+dumbbell_df <- time_series %>%
+    filter(Population.type  == "Refugees (incl. refugee-like situations)")  %>%
+    filter(Year == 2006 | Year == 2016) %>%
+    group_by( ctryiso, Year) %>%
+    summarise(Value2 = sum(Value) )  %>%
+    select(ctryiso, Year, Value2) %>%
+    spread(Year, Value2) %>%
+    mutate(gap = `2006` - `2016`) %>%
+    arrange(desc(gap)) %>%
+    head(10) 
+
+# Make plot
+dumbell <- ggplot(dumbbell_df, aes(x = `2006`, xend = `2016`,
+                                   y = reorder(ctryiso, gap),
+                                   group = ctryiso)) + 
   geom_dumbbell(colour = "#dddddd",
                 size = 3,
-                colour_x = "#FAAB18",
-                colour_xend = "#0072bc") +
+                colour_x = "#0072bc",
+                colour_xend = "#FAAB18") +
   unhcr_style() + 
-  labs(title = "We're living longer",
-       subtitle = "Biggest life expectancy rise, 1967-2007")
+  labs(title = "Where did Refugee Population decreased in the past 10 years?",
+       subtitle = "Biggest decrease in Refugee Population, 2006-2016", 
+       caption = "UNHCR http://popstats.unhcr.org") +
+  scale_x_continuous( label = format_si()) + ## Format axis number
+  theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
+        panel.grid.major.y = element_blank()) ### changing grid line that should appear
+
 ```
+
+generate this chart:
+
+
+```{r echo=FALSE}
+#plot(grouped_bars)
+ggpubr::ggarrange(left_align(dumbell, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
 
 ## Histogram
 
+The following code: 
+
 ```{r message = FALSE, warning = FALSE}
-hist_df <- gapminder %>%
-  filter(year == 2007)
-ggplot(hist_df, aes(lifeExp)) +
-  geom_histogram(binwidth = 5, colour = "white", fill = "#0072bc") +
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+# Prepare Data
+ hist_df <-  df2 %>%
+    mutate(ref.per.local = (Value2 / SP.POP.TOTL) * 100) %>%
+    arrange(desc(Value2)) %>%
+    head(50)
+  
+# Chart
+histo <-  ggplot(hist_df, aes(ref.per.local)) +
+    geom_histogram( colour = "white", fill = "#0072bc") +
+    geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+    unhcr_style() +
+    scale_x_continuous(limits = c(0, 20)) +
+    labs(ylab = "Count of countries",
+         title = "Only 2 countries have more than 5 refugees per 100 locals",
+         subtitle = "Distribution of refugee to local ratio for top 50 refugee hosting countries  in 2016", 
+         caption = "UNHCR http://popstats.unhcr.org - World Bank")
+
+```
+
+generate this chart:
+
+
+```{r echo=FALSE}
+#plot(grouped_bars)
+ggpubr::ggarrange(left_align(histo, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
+
+## Scatterplot
+
+The following code: 
+
+```{r message = FALSE, warning = FALSE}
+
+## Chart
+scatter <- ggplot(df2, aes(y = Value2, x = NY.GDP.MKTP.CD)) + 
+  geom_point(aes(col = Region.Name)) + 
+  #geom_smooth(method = "loess", se = F) + 
   unhcr_style() +
-  scale_x_continuous(limits = c(35, 95),
-                     breaks = seq(40, 90, by = 10),
-                     labels = c("40", "50", "60", "70", "80", "90 years")) +
-  labs(title = "How life expectancy varies",
-       subtitle = "Distribution of life expectancy in 2007")
+  scale_x_continuous( label = format_si(), ) + ## Format axis number
+  scale_y_continuous( label = format_si(), 
+                      limits = c(0, 1000000)) + ## Format axis number
+  scale_color_viridis_d(direction = -1) +
+  
+  labs(title = "Refugee hosting is not correlated with Economic Wealth", 
+       subtitle = "Refugee population Vs GDP", 
+       y = "Refugee", 
+       x = "Gross domestic product (GDP)", 
+       caption = "2016 Figures, UNHCR http://popstats.unhcr.org, World bank") +
+  
+  theme(axis.title = element_text(size = 12))
+
+
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+#plot(grouped_bars)
+ggpubr::ggarrange(left_align(scatter, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
+## Maps
+
+
+The following code: 
+
+```{r , message = FALSE, warning = FALSE}
+
+# Merge data with geographic coordinates
+world <- merge(x = world , y = df2, by.y = "ISO3166.1.Alpha.3" , by.x = "iso_a3")
+df3 <- merge(x = df2 , y = world_points, by.x = "ISO3166.1.Alpha.3" , by.y = "iso_a3")
+
+
+# plot
+map <- ggplot(data = world) + 
+  geom_sf(fill = "antiquewhite", colour = "#7f7f7f", size = 0.2) + 
+  coord_sf(xlim = c(-25, 65), ylim = c(25, 75), expand = FALSE) + ## Clipping on Mediterranean Sea
+  geom_point(data = df3, aes(x = X, y = Y , size = Value2 ), 
+             alpha = 0.6, colour = "red") +
+  scale_size_area( max_size = 20) +
+  xlab("") +
+  ylab("") + 
+  ggtitle("Refugee Distribution") + 
+  unhcr_style() +
+  theme(panel.grid.major = element_line(color = gray(.5), 
+                                        linetype = "dashed", size = 0.5),
+        panel.background = element_rect(fill = "aliceblue"),
+        axis.text.x  = element_blank(),
+        axis.text.y  = element_blank(),
+        legend.position = "none"
+        )
+```
+
+generate this chart:
+
+
+```{r echo=FALSE}
+#plot(grouped_bars)
+ggpubr::ggarrange(left_align(map, c("title")), ncol = 1, nrow = 1)
 ```
 
 -----------------------------
@@ -371,22 +708,47 @@ Remove the legend to become one - it's better to label data directly with text a
 
 Use `guides(colour=FALSE)` to remove the legend for a specific aesthetic (replace `colour` with the relevant aesthetic). 
 
-```{r eval=FALSE}
-multiple_line + guides(colour=FALSE)
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + guides(colour = FALSE)
+
+
 ```
+
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
 
 You can also remove all legends in one go using `theme(legend.position = "none")`:
 
-```{r}
-multiple_line + theme(legend.position = "none")
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + theme(legend.position = "none")
+
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Change the position of the legend
 
 The legend's default position is at the top of your plot. Move it to the left, right or bottom outside the plot with:
 
-```{r}
-multiple_line + theme(legend.position = "right")
+```{r, message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + theme(legend.position = "bottom")
+
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 To be really precise about where we want our legend to go, instead of specifying "right" or "top" to change the general position of where the legend appears in our chart, we can give it specific coordinates. 
@@ -395,46 +757,90 @@ For example `legend.position=c(0.98,0.1)` will move the legend to the bottom rig
 
 To check the exact position where the legend appears in your finalised plot you will have to check the file that is saved out after you run your `finalise_plot()` function, as the position will be relevant to the dimensions of the plot.
 
-```{r eval=FALSE}
-  multiple_line + theme(legend.position = c(0.115,1.05),
-                      legend.direction = "horizontal") +  
-  labs(title = "Living longer",
-       subtitle = "Life expectancy in China and the US\n")
+```{r, message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+                  theme(legend.position = c(0.1,0.5),
+                      legend.direction = "vertical") +  
+                  labs(title = "Refugees Population are not equally spread",
+                       subtitle = "World wide refugee population 1951-2017", 
+                       caption = "UNHCR http://popstats.unhcr.org")
+```
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 To get the legend flush against the left side of your chart, it may be easier to set a negative left margin for the legend using `legend.margin`. The syntax is `margin(top, right, bottom, left)`. 
 
 You'll have to experiment to find the correct number to set the margin to for your chart - save it out with `finalise_plot()` and see how it looks.
 
-```{r eval=FALSE}
-  + theme(legend.margin = margin(0, 0, 0, -200))
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line +
+                 theme(legend.margin = margin(0, 0, 0, -200))
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Remove the legend title
 
 Remove the legend title by tweaking your `theme()`. Don't forget that for any changes to the theme to work, they must be added after you've called `unhcr_style()`!
 
-```{r eval = FALSE}
-+ theme(legend.title = element_blank())
+
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line +
+                 theme(legend.title = element_blank())
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Reverse the order of your legend
 
 Sometimes you need to change the order of your legend for it to match the order of your bars. For this, you need `guides`:
 
-```{r eval = FALSE}
-+ guides(fill = guide_legend(reverse = TRUE))
+
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line +
+                 guides(fill = guide_legend(reverse = TRUE))
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Rearrange the layout of your legend
 
 If you've got many values in your legend, you may need to rearrange the layout for aesthetic reasons. 
 
-You can specify the number of rows you want your legend to have as an argument to `guides`. The below code snippet, for instance, will create a legend with 4 rows:
+You can specify the number of rows you want your legend to have as an argument to `guides`. The below code snippet, for instance, will create a legend with 2 rows:
 
-```{r eval = FALSE}
-+ guides(fill = guide_legend(nrow = 4, byrow = T))
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line +
+                 theme(legend.direction = "horizontal") +
+                 guides(fill = guide_legend(nrow = 2, byrow = T))
 ```
+
+generate this chart:
+
+```{r echo=FALSE}
+
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
 
 You may need to change `fill` in the code above to whatever aesthetic your legend is describing, e.g. `size`, `colour`, etc.
 
@@ -444,8 +850,16 @@ You can override the default appearance of the legend symbols, without changing 
 
 The below will make the size of the legend symbols larger, for instance:
 
-```{r eval = FALSE}
-+ guides(fill = guide_legend(override.aes = list(size = 4))))
+
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line +
+                 guides(fill = guide_legend(override.aes = list(size = 2)))
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Add space between your legend labels
@@ -456,54 +870,46 @@ You can add space by changing the scale labels manually.
 
 For instance, if you have set the colour of your geoms to be dependent on your data, you will get a legend for the colour, and you can tweak the exact labels to get some extra space in by using the below snippet:
 
-```{r eval = F}
-+ scale_colour_manual(labels = function(x) paste0(" ", x, "  "))
+```{r , message = FALSE, warning = FALSE}
+# multiple_line2 <- multiple_line +
+#                  scale_colour_manual(labels = function(x) paste0(" ", x))
+```
+
+generate this chart:
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 If your legend is showing something different, you will need to change the code accordingly. For instance, for fill, you will need `scale_fill_manual()` instead. 
 
 # Make changes to the axes
 
-## Flip the coordinates of a plot
-
-Add `coord_flip()` to make your vertical bars horizontal:
-
-```{r}
-bars <- bars + coord_flip()
-```
-
-```{r echo=FALSE}
-#plot(bars)
-ggpubr::ggarrange(left_align(bars, c("subtitle", "title")), ncol = 1, nrow = 1)
-```
-
 ## Add/remove gridlines
 
-The default theme only has gridlines for the y axis. Add x gridlines with `panel.grid.major.x = element_line`. 
+The theme only has gridlines: remove the gridlines on the y axis with `panel.grid.major.y = element_blank()`)
 
-(Similarly, remove the gridlines on the y axis with `panel.grid.major.y = element_blank()`)
-
-```{r}
-bars <- bars + coord_flip() +
-  theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
-        panel.grid.major.y = element_blank())
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars + 
+  theme(panel.grid.major.x = element_blank())
 ```
 
 ```{r echo=FALSE}
-#plot(bars)
-ggpubr::ggarrange(left_align(bars, c("subtitle", "title")), ncol = 1, nrow = 1)
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Change the axis text manually
 
 You can change the axis text labels freely with `scale_y_continuous` or `scale_x_continuous`:
 
-```{r}
-bars <- bars + scale_y_continuous(limits=c(0,85),
-                   breaks = seq(0, 80, by = 20),
-                   labels = c("0","20", "40", "60", "80 years"))
-#plot(bars)
-ggpubr::ggarrange(left_align(bars, c("subtitle", "title")), ncol = 1, nrow = 1)
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars + scale_y_continuous(limits = c(0, 1000000),
+                   breaks = seq(0, 1000000, by = 200000),
+                   labels = c("0","200,", "400,", "600,", "800,", "1M"))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 This will also specify the limits of your plot as well as where you want axis ticks.
@@ -514,39 +920,60 @@ You can specify that you want your axis text to have thousand separators with an
 
 There are two ways of doing this, one in base R which is a bit fiddly:
 
-```{r eval = FALSE}
-+ scale_y_continuous(labels = function(x) format(x, big.mark = ",",
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars + scale_y_continuous(labels = function(x) format(x, big.mark = ",",
                                                  scientific = FALSE))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The second way relies on the `scales` package, but is much more concise:
 
-```{r eval = FALSE}
-+ scale_y_continuous(labels = scales::comma)
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars +  scale_y_continuous(labels = scales::comma)
 ```
 
-## Add percent symbol to your axis labels
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
+## Add text to your axis labels
 
 This is also easy to add with an argument to `scale_y_continuous`:
 
-```{r eval = FALSE}
-+ scale_y_continuous(labels = function(x) paste0(x, "%"))
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars +  scale_y_continuous(labels = function(x) paste0(x, " Ref."))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Change the plot limits
 
 The long way of setting the limits of your plot explicitly is with `scale_y_continuous` as above. But if you don't need to specify the breaks or labels the shorthand way of doing it is with `xlim` or `ylim`:
 
-```{r}
-bars + ylim(c(0,500))
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars +  ylim(c(0,500000))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Add axis titles
 
 Our default theme has no axis titles, but you may wish to add them in manually. This is done by modifying `theme()` - note that you must do this after the call to `unhcr_style()` or your changes will be overridden:
 
-```{r eval = FALSE}
-+ theme(axis.title = element_text(size = 18))
+```{r , message = FALSE, warning = FALSE}
+bars2 <- bars +
+         theme(axis.title = element_text(size = 18))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Modify axis titles
@@ -555,82 +982,126 @@ If you add in axis titles, they will by default be the column names in your data
 
 For instance, if you wish your x axis title to be "I'm an axis" and your y axis label to be blank, this would be the format:
 
-```{r eval = FALSE}
-+ labs(x = "I'm an axis", 
-       y = "")
+```{r , message = FALSE, warning = FALSE}
+bars3 <- bars2 +
+         labs(x = "Country",  y = "Population")
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars3, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Add axis ticks
 
 You can add axis tick marks by adding `axis.ticks.x` or `axis.ticks.y` to your `theme`:
 
-```{r}
-multiple_line + theme(
-  axis.ticks.x = element_line(colour = "#333333"), 
-  axis.ticks.length =  unit(0.26, "cm"))
+```{r , message = FALSE, warning = FALSE}
+multiple_line2  <- multiple_line + 
+                  theme(
+                    axis.ticks.x = element_line(colour = "#333333"), 
+                    axis.ticks.length =  unit(0.26, "cm"))
 ```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
+```
+
 
 # Add annotations
 
-## Insert labels
+## Insert text within chart
 
 The easiest way to add a text annotation to your plot is using `geom_label`: 
 
-```{r}
-multiple_line + geom_label(aes(x = 1980, y = 45, label = "I'm an annotation!"), 
+```{r, message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+                 geom_label(aes(x = 1990, y = 5000000, label = "I'm an annotation!"), 
                            hjust = 0, 
                            vjust = 0.5, 
                            colour = "#555555", 
                            fill = "white", 
                            label.size = NA, 
-                           family="Helvetica", 
+                           family = "Lato", 
                            size = 6)
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The exact positioning of the annotation will depend on the `x` and `y` arguments (which is a bit fiddly!) and the text alignment, using `hjust` and `vjust` - but more on that below.
 
 Add line breaks where necessary in your label with `\n`, and set the line height with `lineheight`. 
 
-```{r}
-multiple_line <- multiple_line + 
-  geom_label(aes(x = 1980, y = 45, label = "I'm quite a long\nannotation over\nthree rows"), 
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+  geom_label(aes(x = 1990, y = 5000000, 
+                 label = "I'm quite a long\nannotation over\nthree rows"), 
              hjust = 0, 
              vjust = 0.5, 
              lineheight = 0.8,
              colour = "#555555", 
              fill = "white", 
              label.size = NA, 
-             family="Helvetica", 
+             family = "Lato", 
              size = 6) 
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 Let's get our direct labels in there!
 
-```{r}
-multiple_line <- multiple_line + 
-  theme(legend.position = "none") + 
-  xlim(c(1950, 2011)) +
-  geom_label(aes(x = 2007, y = 79, label = "US"), 
-             hjust = 0, 
-             vjust = 0.5, 
-             colour = "#0072bc", 
-             fill = "white", 
-             label.size = NA, 
-             family="Helvetica", 
-             size = 6) +
-  geom_label(aes(x = 2007, y = 72, label = "China"), 
-             hjust = 0, 
-             vjust = 0.5, 
-             colour = "#FAAB18", 
-             fill = "white", 
-             label.size = NA, 
-             family="Helvetica", 
-             size = 6)
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+                  theme(legend.position = "none") + 
+                  xlim(c(1950, 2028)) +
+                  geom_label(aes(x = 2017, y = 5531693, label = "Africa"), 
+                             hjust = 0, 
+                             vjust = 0.5, 
+                             colour = "Black",  
+                             fill = "white", 
+                             label.size = NA, 
+                             family = "Lato", 
+                             size = 6) +
+                  geom_label(aes(x = 2017, y = 693600, label = "America"), 
+                             hjust = 0, 
+                             vjust = 0.5,
+                             colour = "Black",   
+                             fill = "white", 
+                             label.size = NA, 
+                             family = "Lato", 
+                             size = 6) +
+                  geom_label(aes(x = 2017, y = 8608597, label = "Asia"), 
+                             hjust = 0, 
+                             vjust = 0.5, 
+                             colour = "Black",  
+                             fill = "white", 
+                             label.size = NA, 
+                             family = "Lato", 
+                             size = 6) +
+                  geom_label(aes(x = 2017, y = 2300833, label = "Europe"), 
+                             hjust = 0, 
+                             vjust = 0.5, 
+                             colour = "Black",  
+                             fill = "white", 
+                             label.size = NA, 
+                             family = "Lato", 
+                             size = 6) +
+                  geom_label(aes(x = 2017, y = 53671, label = "Oceania"), 
+                             hjust = 0, 
+                             vjust = 0.5,  
+                             colour = "Black", 
+                             fill = "white", 
+                             label.size = NA, 
+                             family = "Lato", 
+                             size = 6) 
+
 ```
 
 ```{r echo=FALSE}
-#plot(multiple_line)
-ggpubr::ggarrange(left_align(multiple_line, c("subtitle", "title")), ncol = 1, nrow = 1)
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Left-align/right-align text
@@ -645,17 +1116,21 @@ Fortunately, if you want to add labels to all your data points, you can simply s
 
 Let's say we want to add data labels to our bar chart:
 
-```{r}
+```{r , message = FALSE, warning = FALSE}
 labelled.bars <- bars +
-  geom_label(aes(x = country, y = lifeExp, label = round(lifeExp, 0)),
+  geom_label(aes(x = Country, y = Value2, label = round(Value2, 0)),
              hjust = 1, 
              vjust = 0.5, 
              colour = "white", 
              fill = NA, 
              label.size = NA, 
-             family="Helvetica", 
+             family = "Lato", 
              size = 6)
-labelled.bars
+
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(labelled.bars, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The above code automatically adds one text label for each continent, without us having to add `geom_label` five separate times. 
@@ -668,29 +1143,38 @@ If you'd rather add left-aligned labels for your bars, just set the `x` argument
 
 The exact value of `y` will depend on the range of your data. 
 
-```{r}
+```{r , message = FALSE, warning = FALSE}
 labelled.bars.v2 <- bars +
-  geom_label(aes(x = country, 
+  geom_label(aes(x = Country, 
                  y = 4, 
-                 label = round(lifeExp, 0)),
+                 label = round(Value2, 0)),
              hjust = 0, 
              vjust = 0.5, 
              colour = "white", 
              fill = NA, 
              label.size = NA, 
-             family="Helvetica", 
+             family = "Lato", 
              size = 6)
-labelled.bars.v2
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(labelled.bars.v2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Add a line
 
 Add a line with `geom_segment`:
 
-```{r}
-multiple_line + geom_segment(aes(x = 1979, y = 45, xend = 1965, yend = 43), 
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+                  geom_segment(aes(x = 1979, y = 4500000, xend = 1965, yend = 4300000), 
                              colour = "#555555", 
-                             size=0.5)
+                             size = 4)
+
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The `size` argument specifies the thickness of the line. 
@@ -699,11 +1183,16 @@ The `size` argument specifies the thickness of the line.
 
 For a curved line, use `geom_curve` instead of `geom_segment`:
 
-```{r}
-multiple_line + geom_curve(aes(x = 1979, y = 45, xend = 1965, yend = 43), 
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + geom_curve(aes(x = 1979, y = 4500000, xend = 1965, yend = 4300000), 
                            colour = "#555555", 
                            curvature = -0.2,
-                           size=0.5)
+                           size = 0.5)
+
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The `curvature` argument sets the amount of curve: 0 is a straight line, negative values give a left-hand curve and positive values give a right-hand curve.
@@ -712,12 +1201,16 @@ The `curvature` argument sets the amount of curve: 0 is a straight line, negativ
 
 Turning a line into an arrow is fairly straightforward: just add the `arrow` argument to your `geom_segment` or `geom_curve`:
 
-```{r}
-multiple_line + geom_curve(aes(x = 1979, y = 45, xend = 1965, yend = 43), 
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + geom_curve(aes(x = 1979, y = 4500000, xend = 1965, yend = 4300000), 
                              colour = "#555555", 
-                             size=0.5, 
+                             size = 0.5, 
                              curvature = -0.2,
                              arrow = arrow(length = unit(0.03, "npc")))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The first argument to `unit` sets the size of the arrowhead. 
@@ -728,16 +1221,27 @@ The easiest way to add a line across the whole plot is with `geom_vline()`, for 
 
 Optional additional arguments allow you to specify the size, colour and type of line (the default option is a solid one).
 
-```{r}
-multiple_line + geom_hline(yintercept = 10, size = 1, colour = "red", linetype = "dashed")
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+                  geom_hline(yintercept = 10000000, size = 1, colour = "red", linetype = "dashed")
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 The line obviously doesn't add much in this example, but this is useful if you want to highlight something, e.g. a threshold level, or an average value. 
 
 It's also especially useful because our design style - as you may already have noticed from the charts on this page - is to add a vertical or horizontal baseline to our charts. This is the code to use:
 
-```{r eval = FALSE}
-+ geom_hline(yintercept = 0, size = 1, colour = "#333333")
+```{r , message = FALSE, warning = FALSE}
+multiple_line2 <- multiple_line + 
+                  geom_hline(yintercept = 8000000, size = 1, colour = "#333333")
+
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 # Work with small multiples
@@ -752,29 +1256,29 @@ Add the variable you want to divide by to this line of code: `facet_wrap( ~ vari
 
 An additional argument to facet wrap, `ncol`, allows you to specify the number of columns:
 
-```{r}
+```{r , message = FALSE, warning = FALSE}
 #Prepare data
-facet <- gapminder %>%
-  filter(continent != "Americas") %>%
-  group_by(continent, year) %>%
-  summarise(pop = sum(as.numeric(pop)))
+facet <- time_series %>%
+    filter(Population.type  == "Refugees (incl. refugee-like situations)" & !(is.na(Region.Name))) %>%
+    group_by(Year, Region.Name ) %>%
+    summarise(Value2 = sum(Value) ) 
+
 #Make plot
 facet_plot <- ggplot() +
-  geom_area(data = facet, aes(x = year, y = pop, fill = continent)) +
-  scale_fill_manual(values = c("#FAAB18", "#0072bc","#990000", "#588300")) + 
-  facet_wrap( ~ continent, ncol = 5) + 
-  scale_y_continuous(breaks = c(0, 2000000000, 4000000000),
-                     labels = c(0, "2bn", "4bn")) +
+  geom_area(data = facet, aes(x = Year, y = Value2, fill = Region.Name)) +
+  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
+  facet_wrap( ~ Region.Name, ncol = 5) + 
+  scale_y_continuous(labels = format_si()) +
   unhcr_style() +
   geom_hline(yintercept = 0, size = 1, colour = "#333333") +
   theme(legend.position = "none",
         axis.text.x = element_blank()) +
-  labs(title = "Asia's rapid growth",
-       subtitle = "Population growth by continent, 1952-2007")
+  labs(title = "Africa & Asia are hosting the biggest Refugee population",
+       subtitle = "Refugee Population growth by continent, 1951-2016")
 ```
 
 ```{r echo=FALSE}
-plot(facet_plot)
+ggpubr::ggarrange(left_align(facet_plot, c("subtitle", "title")), ncol = 1, nrow = 1)
 
 ```
 
@@ -786,24 +1290,22 @@ By default, faceting uses fixed axis scales across the small multiples. It's alw
 
 If you just want to free the scales for one axis set the argument to `free_x` or `free_y`. 
 
-```{r}
+```{r , message = FALSE, warning = FALSE}
 #Make plot
 facet_plot_free <- ggplot() +
-  geom_area(data = facet, aes(x = year, y = pop, fill = continent)) +
-  facet_wrap(~ continent, scales = "free") + 
+  geom_area(data = facet, aes(x = Year, y = Value2, fill = Region.Name)) +
+  facet_wrap(~ Region.Name, scales = "free") + 
   unhcr_style() +
-  scale_fill_manual(values = c("#FAAB18", "#0072bc","#990000", "#588300")) +
+  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
   geom_hline(yintercept = 0, size = 1, colour = "#333333") +
   theme(legend.position = "none",
         axis.text.x = element_blank(),
         axis.text.y = element_blank()) +
   labs(title = "It's all relative",
-       subtitle = "Relative population growth by continent,1952-2007")
+       subtitle = "Refugee Population growth by continent, 1951-2016")
 ```
 
 ```{r echo=FALSE}
-#plot(facet_plot_free)
-
 ggpubr::ggarrange(left_align(facet_plot_free, c("subtitle", "title")), ncol = 1, nrow = 1)
 
 ```
@@ -818,8 +1320,13 @@ You shouldn't ordinarily need to change the default margins from the theme but i
 
 The numbers specify the top, right, bottom, and left margin respectively - but you can also specify directly which margin you want to change. For example, let's try giving the subtitle an extra-large bottom margin: 
 
-```{r}
-bars + theme(plot.subtitle=element_text(margin=margin(b=75)))
+```{r, message = FALSE, warning = FALSE}
+bars2 <- bars + 
+          theme(plot.subtitle = element_text(margin = margin(b = 75)))
+```
+
+```{r echo=FALSE}
+ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 Hm... maybe not. 
@@ -840,38 +1347,19 @@ pandoc.table(table, style = 'rmarkdown')
 
 So what you'd need to do is add this code to your chart if for example you wanted the height of your plot to be 650px instead of 450px. 
 
-```{r}
-bar_chart_tall <- bars + theme(axis.text.x = element_text(margin=margin(t = 7, b = 10)))
+```{r, message = FALSE, warning = FALSE}
+bar_chart_tall <- bars + 
+                  theme(axis.text.x = element_text(margin = margin(t = 7, b = 10)))
 #bar_chart_tall
+```
 
+```{r echo=FALSE}
 ggpubr::ggarrange(left_align(bar_chart_tall, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 Although it is much less likely, but if you do want to do the equivalent for a line chart and export it at a larger than default height, you need to do the same but change your values for t to negative values based on the table above. 
 
-## Reorder bars by size
 
-By default, R will display your data in alphabetical order, but arranging it by size instead is simple: just wrap `reorder()` around the `x` or `y` variable you want to rearrange, and specify which variable you want to reorder it by. 
-
-E.g. `x = reorder(country, pop)`. Ascending order is the default, but you can change it to descending by wrapping `desc()` around the variable you're ordering by:
-
-```{r}
-bars <- ggplot(bar_df, aes(x = reorder(country, lifeExp), y = lifeExp)) +
-  geom_bar(stat = "identity", position = "identity", fill = "#0072bc") +
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  unhcr_style() +
-  coord_flip() +
-  labs(title = "Reunion is highest",
-       subtitle = "Highest African life expectancy, 2007") +
-  theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
-        panel.grid.major.y = element_blank())
-```
-
-```{r echo=FALSE}
-#plot(bars)
-
-ggpubr::ggarrange(left_align(bars, c("subtitle", "title")), ncol = 1, nrow = 1)
-```
 
 ## Reorder bars manually
 
@@ -891,21 +1379,26 @@ You can also use this to reorder the stacks of a stacked bar chart.
 
 You can set aesthetic values like fill, alpha, size conditionally with `ifelse()`. 
 
-The syntax is `fill=ifelse(logical_condition, fill_if_true, fill_if_false)`. 
+The syntax is `fill = ifelse(logical_condition, fill_if_true, fill_if_false)`. 
 
-```{r}
+```{r , message = FALSE, warning = FALSE}
 highlighted <- ggplot(bar_df, 
-       aes(x = reorder(country, lifeExp), y = lifeExp)) +
-  geom_bar(stat = "identity", position = "identity", 
-           fill = ifelse(bar_df$country == "Mauritius", "#0072bc", "#CCCCCC")) +
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  unhcr_style() +
-  coord_flip() +
-  labs(title = "Reunion is highest",
-       subtitle = "Highest African life expectancy, 2007") +
-  theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
-        panel.grid.major.y = element_blank()) 
+                      aes(x = reorder(Country, Value2), y = Value2)) +
+              geom_bar(stat = "identity", position = "identity", 
+                       fill = ifelse(bar_df$Country == "Turkey", "#0072bc", "#CCCCCC")) +
+              geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+              unhcr_style() +
+              coord_flip() +
+              scale_y_continuous(label = format_si()) + ## Format axis number
+              labs(title = "Turkey is by the far the biggest Refugee hosting country",
+                   subtitle = "Top 10 Refugee Population per country in 2017") +
+              theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
+                    panel.grid.major.y = element_blank()) 
+```
 
-
+```{r echo=FALSE}
 ggpubr::ggarrange(left_align(highlighted , c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
+
+# Conclusion
+
