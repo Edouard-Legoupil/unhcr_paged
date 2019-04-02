@@ -6,7 +6,8 @@ output:
   pagedown::html_paged:
     toc: true
     # change to true for a self-contained document, but it'll be a litte slower for Pandoc to render
-    self_contained: true
+    self_contained: false
+    highlight: null
     toc-title: Contents
     paged-footnotes: true
     css:
@@ -53,7 +54,7 @@ Reproducibility is key in data analysis:
  
  * It allows to quickly to scan the analysis workflow and point potential errors,
  
- * It allows for peer review and/or can help peers to learn from what is presented.
+ * It allows for peer review and/or can help peers to learn from what is presented. Openness and transparency improves trust in results.
  
  The entry point to analysis reproducibility is to have each step documented through scripts, rather than using _point and click_ software interface. R is a very powerfull language for this:
 
@@ -67,7 +68,7 @@ Reproducibility is key in data analysis:
 
 ![__Diagram:__ Data Science Workflow](data-science.png)
  
-This cookbook does not aim at replacing the numerous books available on data science, like the [R for Data Science](https://r4ds.had.co.nz)  
+This cookbook does not aim at replacing the numerous books available on data science, like the [R for Data Science](https://r4ds.had.co.nz), it is rather a quick reference to be used by colleagues that aims at building skills in thhe area.  
  
  
 In November 2018, the first HumanitaRian-useR-group took place. An online [skype group](https://join.skype.com/qYBKC5q3wKp4), with over 150 members at the time of writing is openly accessible and tutorial based on humanitarian situations are published on a [blog](http://humanitarian-user-group.github.io/).  
@@ -78,13 +79,15 @@ Effective chart are first those that __support a message__. From the same datase
 
 Simples rules can help to achived this:
 
- * __Outline the message__: Always use the main conclusion you want to draw within the title of the chart, use the subtitle to present the data that you have used in the chart. annotation in the chart can also help explaining why the chart is an evidence of the message you present.
+ * __Outline the message__: Always use the main conclusion you want to draw within the title of the chart, use the subtitle to present the data that you have used in the chart. annotation in the chart can also help explaining why the chart is an evidence of the message you present. The message resides in the shape of the data. Chart titles should be clear and accurate, includes time increment and units.
+
+ * __Do keep the chart as simple as possible__. Edward Tufte, a statistician, said “_Graphical elegance is often found in simplicity of design and complexity of data._” A common mistake we all make with charts is overdressing them with unnecessary elements. The usual suspects are excess color, graphical clutter and abuse of special effects. Details like these won’t impress anyone, but decluttering your charts will.
  
- * __Do keep the chart as simple as possible__. Edward Tufte, a statistician, said “_Graphical elegance is often found in simplicity of design and complexity of data._” A common mistake we all make with charts is overdressing them with unnecessary elements. The usual suspects are excess color, graphical clutter and abuse of special effects. Displaying too many decimal places in our values is another one to watch out for. Details like these won’t impress anyone, but decluttering your charts will.
+ * __Focus on legibility__: Graph should be designed to higlight trends, patterns and make exceptions more visible. They can also be designed to reveal relationships among multiple values. For instance, for bar graph presenting categories, do use a horizontal bar graph and arrange data from greatest to least in descending order. 
  
- * __Focus on legibility__: For bar graph presenting categories, do use a horizontal bar graph and arrange data from greatest to least in descending order. Use color to communicate information and not for decoration. Too many colors can confuse and disorient. When designing a graph, color can be both your friend and your enemy. Depending on how we use it, it can either gracefully highlight data and show a change, or create visual overload and confuse the audience. 
+ * __Use color to communicate information and not for decoration__. Too many colors can confuse and disorient. When designing a graph, color can be both your friend and your enemy. Depending on how we use it, it can either gracefully highlight data and show a change, or create visual overload and confuse the audience. Don’t use more than six colors or six different categories within the same chart: human brain cannot process more than this.
  
- * __Reshape first your data__: Don’t use more than six colors or six different categories within the same chart: human brain cannot process more than this. Extra decimal places look impressive and imply accuracy, but they’re often pointless. So, take a step back and round numbers off before plotting. Overstating the numerical precision of your data by showing too many decimal places can make your chart seem accurate, but this specificity is just misleading. Even when you don’t exaggerate the precision of your data, and your numbers are genuinely accurate, overloading your audience with such detail is often useless
+ * __Reshape first your data__:  A good chart establish a balance between content & message: Too many content -> not legible; Not enough content -> not precise. Therefore the content (i.e the data) shall be adjusted content to message. For instance, extra decimal places look impressive and imply accuracy, but they’re often pointless. So, take a step back and round numbers off before plotting. Overstating the numerical precision of your data by showing too many decimal places can make your chart seem accurate, but this specificity is just misleading. Even when you don’t exaggerate the precision of your data, and your numbers are genuinely accurate, overloading your audience with such detail is often useless
 
 
 By using this cookbook, you can benefit from a simple and lean style and focus on your data, message and story-telling, rather than wasting precious time on chart beautification and report design. 
@@ -115,6 +118,11 @@ using <- function(...) {
 using('tidyverse','gganimate','gghighlight','ggpubr', 'dplyr', 'tidyr', 'gapminder', 'ggplot2',  'ggalt', 'forcats', 'R.utils', 'png', 'grid', 'ggpubr', 'scales', 'bbplot', 'markdown', 'pander', 'ISOcodes', 'wbstats', 'sf', 'rnaturalearth', 'rnaturalearthdata', 'ggspatial')
 ```
 
+All graphics in the cookbook are created with the library `ggplot2`. Without going into too much details, the main concept behind this package is called the __grammar of graphics__. It's a very powerful abstraction to describe any kind of plots using a limited number of instructions. 
+
+The idea is that you can build every graph from the same few components: a dataset (__data__), a set of geometry (__geom__ : visual marks that represents data points: bar, line, point, area, polygon, etc.) and a coordinate system (__coord__). To display data values, variables in the dataset shall be mapped to aesthetic properties of the geom (__aes__: like size, color and x and y locations). In addition, some plots visualise a transformation of the original variable that is described by the instruction __stat__.
+
+Using scripts can appear difficult at the begining but with a bit of practice, it provides huge gain of productivity compared to point and click interactions.
 
 UNHCR style is delivered through the function: `unhcr_style()`. This function essentially modifies certain arguments in the `theme` function of `ggplot2`.
 
@@ -173,6 +181,10 @@ The following for instance will add some gridlines, by adding extra theme argume
 theme(panel.grid.major.x = element_line(color = "#cbcbcb"), 
         panel.grid.major.y = element_blank())
 ```
+
+
+
+
 
 A specific statement is used to aligne the chart, it's title, subtitle and source
 
@@ -240,9 +252,11 @@ A dedicated template - used in this document - allows to implement quickly and d
 
 ## Prepare some data 
 
-Last Let's now download & slighlty tidy the data from UNHCR popstat API in order to use them in the tutorial
+This cookbook is based on real UNHCR data.
 
-```{r  cache = TRUE, message=FALSE, warning=FALSE}
+Last Let's now download (& slighlty tidy) data from UNHCR popstat API together with indicators from the worldbank and some geodata.
+
+```{r preparedata, cache = TRUE, message=FALSE, warning=FALSE}
 # Time series
 url <- paste( 'http://popstats.unhcr.org/en/time_series.csv') 
 download.file(url, destfile = "unhcr_popstats_export_time_series_all_data.csv" )
@@ -266,7 +280,7 @@ download.file(url, destfile = "countrycode.csv" )
 countrycode <- read.csv("countrycode.csv") 
 #names(countrycode)
 
-### Rewrite country name 
+### Rewrite country name in UNHCR dataset for further matching
 time_series$ctryiso <- as.character(time_series$Country)
 time_series$ctryiso[time_series$Country == "Bonaire"] <- "Bonaire, Sint Eustatius and Saba" 
 time_series$ctryiso[time_series$Country == "Central African Rep."] <- "Central African Republic" 
@@ -298,7 +312,7 @@ time_series <- merge(x = time_series , by.x = "ctryiso", all.x = TRUE, y = count
 # Population, GDP & GNP per Capita from WorldBank
 wb_data <- wb( indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD", "NY.GDP.PCAP.CD", "NY.GNP.PCAP.CD"),
                startdate = 1951, enddate = 2017, return_wide = TRUE)
-# Rename columns for later merging
+# Renaming variables for further matching
 names(wb_data)[1] <- "ISO3166.1.Alpha.3"
 names(wb_data)[2] <- "Year"
 
@@ -320,8 +334,24 @@ world_points <- cbind(world, st_coordinates(centroids))
 
 ## Line chart
 
+Some key points to consider when designing bar chart are:
 
-The following code: 
+ * The purpose of the line chart is to show a trend. It is often the best solution when the data presents a time series referring to a single value that changes at regular intervals.
+ 
+ * Choose the y-axis scale appropriately so that we can see the trend. Too flat obscures the message and too exaggerated overstates the trend. The right height is two-thirds of the chart area.
+ 
+ * The weight of the fever line should be thick enough to stand out against the grid line but still thin enough to show the twists and turns of the line. Keep the grid lines thin.
+
+ * Unlike a bar chart, a fever line does not necessarily require a zero baseline. Some data trend won’t be discernible starting from zero baseline.
+ * Avoid labeling at long distance, a legend separated from the line requires the readers to do extra work cross-referencing between the key and the line. Label the lines directly. Direct labelling allows the reader to identify the lines quickly and focus on comparing and contrasting the patterns.
+
+ * Use the legend only when the space is tight and the lines intersect extensively. The order of the legend should match the ranking of the end points since they are the most current data points.
+
+ * Annotations help to clarify the message.
+
+
+
+Let's see what code is required for such chart: 
 
 ```{r ,message = FALSE, warning = FALSE}
 #Prepare data
@@ -345,15 +375,25 @@ line <- ggplot(line_df, aes(x = Year, y = Value2)) +
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(line)
 ggpubr::ggarrange(left_align(line, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Multiple line chart
 
+Some additional points to consider when designing a multiple line chart;
 
-The following code: 
+ * Don’t use  dashed lines and shape markers to differentiate each line! You can use solid lines exclusively by limiting the chart to four or fewer lines. Varying weights and shades do the work of differentiating the lines more effectively than distracting patterns and markers.
+
+ * In a single chart, keep the maximum number of lines to three or possibly four if the lines are not intersecting at many points. The purpose of a multiple-line chart is to compare and contrast different data series. 
+
+
+
+ * The most important line should be one colour and the other lines should be shades of second colour. 
+
+
+Let's see what code is required for such chart: 
 
 ```{r ,message = FALSE, warning = FALSE}
 #Prepare data
@@ -379,18 +419,46 @@ multiple_line <- ggplot(multiple_line_df, aes(x = Year, y = Value2,
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(multiple_line)
 ggpubr::ggarrange(left_align(multiple_line, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Bar chart
 
+Some key points to consider when designing bar chart are:
+
+ * Start at the zero baseline! No exception. Do not clip the axis in order to highlight disparities at the top of the axis. Instead, try recalculating your data as percentages, or try another type of chart;
+ 
+ * Ensure numerical axis labels are aligned to the decimal point;
+ 
+ * Clearly denote currency or units;
+ 
+ * When axis lines are present, it is not necessary to label each data value. However, it can be useful to highlight the final value or other important data points. 
+ 
+ * Convert your data to rounded, easily digestible values for chart labelling
+ 
+ * Omit axes and baselines when data values are labeled, simpler, better!
+
+ * When the range of your data crosses natural numerical milestones, such as from millions to billions, set the entire chart in the larger milestone. A chart should never reflect more than 1,000 millions. etc.
+
+ * Ensure labels fit neatly under the bars in no more than two lines. 
+ 
+ * Don’t use 3D effect!
+ 
+ * Horizontal bar charts help compare long lists of values or categories. It has the advantage of printing long labels without using two lines or printing vertical text, as would be required for a vertical bar. 
+ 
+ * Remember to sort your data before charting so that readers can easily compare.
+
+ * Labeled values eliminate the need for grid lines, while rounding is done to make the values easy to digest.
+
+
+
 Note that by default, R will display your data in alphabetical order, but arranging it by size instead is simple: just wrap `reorder()` around the `x` or `y` variable you want to rearrange, and specify which variable you want to reorder it by. 
 
 E.g. `x = reorder(Country, Value2)`. Ascending order is the default, but you can change it to descending by wrapping `desc()` around the variable you're ordering by.
 
-The following code: 
+Let's see what code is required for such chart: 
 
 ```{r ,message = FALSE, warning = FALSE}
 #Prepare data
@@ -423,14 +491,14 @@ bars <- ggplot(bar_df, aes(x = reorder(Country, Value2), ## Reordering country b
 
 Generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(bars)
 ggpubr::ggarrange(left_align(bars, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Stacked bar chart
 
-The following code: 
+Let's see what code is required for such chart: 
 
 ```{r ,message = FALSE, warning = FALSE}
 #prepare data
@@ -439,14 +507,7 @@ df1 <- time_series %>%
   group_by(Year, Country, ISO3166.1.Alpha.3 ) %>%
   summarise(Value2 = sum(Value) )
 
-#df1 <- as.data.frame(df1)
 
-# Population, GDP & GNP per Capita from WorldBank
-wb_data <- wb( indicator = c("SP.POP.TOTL", "NY.GDP.MKTP.CD", "NY.GDP.PCAP.CD", "NY.GNP.PCAP.CD"),
-               startdate = 1951, enddate = 2017, return_wide = TRUE)
-
-names(wb_data)[1] <- "ISO3166.1.Alpha.3"
-names(wb_data)[2] <- "Year"
 df2 <- merge(x = df1, y = wb_data, by = c("ISO3166.1.Alpha.3" ,"Year"), all.x = TRUE)
 df2 <- merge(x = df2, y = countrycode[ ,c("ISO3166.1.Alpha.3", "Region.Name")], by = "ISO3166.1.Alpha.3" , all.x = TRUE)
 df2 <- df2[ !(is.na(df2$Region.Name)) & !(is.na(df2$NY.GNP.PCAP.CD)) , ]
@@ -480,7 +541,7 @@ stacked_bars <- ggplot(data = stacked_df1,
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(stacked_bars)
 ggpubr::ggarrange(left_align(stacked_bars, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -497,7 +558,7 @@ Making a grouped bar chart is very similar to making a bar chart.
 
 You just need to change `position = "identity"` to `position = "dodge"`, and set the `fill` aesthetically instead:
 
-The following code: 
+Let's see what code is required for such chart: 
 
 ```{r ,message = FALSE, warning = FALSE}
 #Prepare data
@@ -537,7 +598,7 @@ grouped_bars <- ggplot(grouped_bar_df,
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(grouped_bars)
 ggpubr::ggarrange(left_align(grouped_bars, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -546,7 +607,7 @@ ggpubr::ggarrange(left_align(grouped_bars, c("subtitle", "title")), ncol = 1, nr
 
 Another way of showing difference is a dumbbell chart:
 
-The following code: 
+Let's see what code is required for such chart: 
 
 ```{r ,message = FALSE, warning = FALSE}
 library("ggalt")
@@ -585,7 +646,7 @@ dumbell <- ggplot(dumbbell_df, aes(x = `2006`, xend = `2016`,
 generate this chart:
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(grouped_bars)
 ggpubr::ggarrange(left_align(dumbell, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -593,7 +654,20 @@ ggpubr::ggarrange(left_align(dumbell, c("subtitle", "title")), ncol = 1, nrow = 
 
 ## Histogram
 
-The following code: 
+Histogram are used to plot the frequency of score occurrences in a continuous variable (numeric, integer) that has been divided into classes, called bins. 
+
+A histogram is __not__ a bar chart: histograms are used to show distributions (or the shape) of variables while bar charts are used to compare variables.
+
+Some data sets have a distinct shape. Data hardly ever fall into perfect patterns, so you have to decide whether the data shape. The two interpretation key are the following:
+
+ * Symmetric bell shape: if you cut it down the middle and the left-hand and right-hand sides resemble mirror images of each other. The middle of the chart is the place when the largest occurence appears: in this case, we have something closed to a normal distribution. __Kurtosis__ is a measure of whether the data are heavy-tailed or light-tailed relative to a normal distribution. That is, data sets with high kurtosis tend to have heavy tails, or outliers. Data sets with low kurtosis tend to have light tails, or lack of outliers.
+ 
+ * Skewed right or left:looks like a lopsided mound, with a tail going off to the right or left. __Skewness__ is a measure of symmetry, or more precisely, the lack of symmetry. A distribution, or data set, is symmetric if it looks the same to the left and right of the center point.
+ 
+
+ A uniform distribution would be the extreme case.
+
+Let's see what code is required for such chart: 
 
 ```{r message = FALSE, warning = FALSE}
 # Prepare Data
@@ -618,7 +692,7 @@ histo <-  ggplot(hist_df, aes(ref.per.local)) +
 generate this chart:
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(grouped_bars)
 ggpubr::ggarrange(left_align(histo, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -626,10 +700,14 @@ ggpubr::ggarrange(left_align(histo, c("subtitle", "title")), ncol = 1, nrow = 1)
 
 ## Scatterplot
 
-The following code: 
+Scatterplot are used to check for correlation. A trend line can be added to compare two set of measures to determine if as one set goes up, the other set correspondingly goes up or down and how strongly.
+
+Scatterplot are also a good way to identify clusters of observation.
+
+
+Let's see what code is required for such chart: 
 
 ```{r message = FALSE, warning = FALSE}
-
 ## Chart
 scatter <- ggplot(df2, aes(y = Value2, x = NY.GDP.MKTP.CD)) + 
   geom_point(aes(col = Region.Name)) + 
@@ -639,29 +717,32 @@ scatter <- ggplot(df2, aes(y = Value2, x = NY.GDP.MKTP.CD)) +
   scale_y_continuous( label = format_si(), 
                       limits = c(0, 1000000)) + ## Format axis number
   scale_color_viridis_d(direction = -1) +
-  
   labs(title = "Refugee hosting is not correlated with Economic Wealth", 
        subtitle = "Refugee population Vs GDP", 
        y = "Refugee", 
        x = "Gross domestic product (GDP)", 
        caption = "2016 Figures, UNHCR http://popstats.unhcr.org, World bank") +
-  
   theme(axis.title = element_text(size = 12))
-
-
 ```
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(grouped_bars)
 ggpubr::ggarrange(left_align(scatter, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
 ## Maps
 
+A map is a graphic representation or scale model of spatial concepts. It is a means for conveying geographic information. Maps are a universal medium for communication, easily understood and appreciated by most people, regardless of language or culture. Maps are not realistic representations of the actual world. All maps are estimations, generalizations, and interpretations of true geographic conditions.
 
-The following code: 
+One key rule when creating a map is:
+
+ 1. Absolute value: Proportional symbol
+ 2. Relative value (ratio): Choropleth
+
+
+Let's see what code is required for such chart: 
 
 ```{r , message = FALSE, warning = FALSE}
 
@@ -693,12 +774,81 @@ map <- ggplot(data = world) +
 generate this chart:
 
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 #plot(grouped_bars)
 ggpubr::ggarrange(left_align(map, c("title")), ncol = 1, nrow = 1)
 ```
 
 -----------------------------
+
+# Work with small multiples
+
+Small multiple charts are easy to create with ggplot: it's called faceting.
+
+## Facets
+
+ * With four or more data series, an array of individual charts can display a pattern and allows better comparison among all lines.
+
+If you have data that you want to visualise split up by some variable, you need to use `facet_wrap` or `facet_grid`. 
+
+Add the variable you want to divide by to this line of code: `facet_wrap( ~ variable)`.
+
+An additional argument to facet wrap, `ncol`, allows you to specify the number of columns:
+
+```{r , message = FALSE, warning = FALSE}
+#Prepare data
+facet <- time_series %>%
+    filter(Population.type  == "Refugees (incl. refugee-like situations)" & !(is.na(Region.Name))) %>%
+    group_by(Year, Region.Name ) %>%
+    summarise(Value2 = sum(Value) ) 
+
+#Make plot
+facet_plot <- ggplot() +
+  geom_area(data = facet, aes(x = Year, y = Value2, fill = Region.Name)) +
+  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
+  facet_wrap( ~ Region.Name, ncol = 5) + 
+  scale_y_continuous(labels = format_si()) +
+  unhcr_style() +
+  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank()) +
+  labs(title = "Africa & Asia are hosting the biggest Refugee population",
+       subtitle = "Refugee Population growth by continent, 1951-2016")
+```
+
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+ggpubr::ggarrange(left_align(facet_plot, c("subtitle", "title")), ncol = 1, nrow = 1)
+
+```
+
+## Free scales
+
+You may have noticed in the chart above that Oceania, with its relatively small population, has disappeared completely. 
+
+By default, faceting uses fixed axis scales across the small multiples. It's always best to use the same y axis scale across small multiples, to avoid misleading, but sometimes you may need to set these independently for each multiple, which we can do by adding the argument `scales = "free"`. 
+
+If you just want to free the scales for one axis set the argument to `free_x` or `free_y`. 
+
+```{r , message = FALSE, warning = FALSE}
+#Make plot
+facet_plot_free <- ggplot() +
+  geom_area(data = facet, aes(x = Year, y = Value2, fill = Region.Name)) +
+  facet_wrap(~ Region.Name, scales = "free") + 
+  unhcr_style() +
+  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
+  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank()) +
+  labs(title = "It's all relative",
+       subtitle = "Refugee Population growth by continent, 1951-2016")
+```
+
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+ggpubr::ggarrange(left_align(facet_plot_free, c("subtitle", "title")), ncol = 1, nrow = 1)
+
+```
+
 
 # Make changes to the legend
 
@@ -716,7 +866,7 @@ multiple_line2 <- multiple_line + guides(colour = FALSE)
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -729,11 +879,7 @@ multiple_line2 <- multiple_line + theme(legend.position = "none")
 
 ```
 
-generate this chart:
 
-```{r echo=FALSE}
-ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
-```
 
 ## Change the position of the legend
 
@@ -746,7 +892,7 @@ multiple_line2 <- multiple_line + theme(legend.position = "bottom")
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -767,7 +913,7 @@ multiple_line2 <- multiple_line +
 ```
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -783,7 +929,7 @@ multiple_line2 <- multiple_line +
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -800,7 +946,7 @@ multiple_line2 <- multiple_line +
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -817,7 +963,7 @@ multiple_line2 <- multiple_line +
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -836,7 +982,7 @@ multiple_line2 <- multiple_line +
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
@@ -858,7 +1004,7 @@ multiple_line2 <- multiple_line +
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -877,7 +1023,7 @@ For instance, if you have set the colour of your geoms to be dependent on your d
 
 generate this chart:
 
-```{r echo=FALSE}
+```{r echo=FALSE,  message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -894,7 +1040,7 @@ bars2 <- bars +
   theme(panel.grid.major.x = element_blank())
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -908,7 +1054,7 @@ bars2 <- bars + scale_y_continuous(limits = c(0, 1000000),
                    labels = c("0","200,", "400,", "600,", "800,", "1M"))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE,  message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -925,7 +1071,7 @@ bars2 <- bars + scale_y_continuous(labels = function(x) format(x, big.mark = ","
                                                  scientific = FALSE))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -935,7 +1081,7 @@ The second way relies on the `scales` package, but is much more concise:
 bars2 <- bars +  scale_y_continuous(labels = scales::comma)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -947,7 +1093,7 @@ This is also easy to add with an argument to `scale_y_continuous`:
 bars2 <- bars +  scale_y_continuous(labels = function(x) paste0(x, " Ref."))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -959,7 +1105,7 @@ The long way of setting the limits of your plot explicitly is with `scale_y_cont
 bars2 <- bars +  ylim(c(0,500000))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -972,7 +1118,7 @@ bars2 <- bars +
          theme(axis.title = element_text(size = 18))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -987,7 +1133,7 @@ bars3 <- bars2 +
          labs(x = "Country",  y = "Population")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars3, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1002,7 +1148,7 @@ multiple_line2  <- multiple_line +
                     axis.ticks.length =  unit(0.26, "cm"))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1025,7 +1171,7 @@ multiple_line2 <- multiple_line +
                            size = 6)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1047,7 +1193,7 @@ multiple_line2 <- multiple_line +
              size = 6) 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1100,7 +1246,7 @@ multiple_line2 <- multiple_line +
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1129,7 +1275,7 @@ labelled.bars <- bars +
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(labelled.bars, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1157,7 +1303,7 @@ labelled.bars.v2 <- bars +
              size = 6)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(labelled.bars.v2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1173,7 +1319,7 @@ multiple_line2 <- multiple_line +
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1191,7 +1337,7 @@ multiple_line2 <- multiple_line + geom_curve(aes(x = 1979, y = 4500000, xend = 1
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1209,7 +1355,7 @@ multiple_line2 <- multiple_line + geom_curve(aes(x = 1979, y = 4500000, xend = 1
                              arrow = arrow(length = unit(0.03, "npc")))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1226,7 +1372,7 @@ multiple_line2 <- multiple_line +
                   geom_hline(yintercept = 10000000, size = 1, colour = "red", linetype = "dashed")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1240,75 +1386,11 @@ multiple_line2 <- multiple_line +
 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(multiple_line2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
-# Work with small multiples
 
-Small multiple charts are easy to create with ggplot: it's called faceting.
-
-## Facets
-
-If you have data that you want to visualise split up by some variable, you need to use `facet_wrap` or `facet_grid`. 
-
-Add the variable you want to divide by to this line of code: `facet_wrap( ~ variable)`.
-
-An additional argument to facet wrap, `ncol`, allows you to specify the number of columns:
-
-```{r , message = FALSE, warning = FALSE}
-#Prepare data
-facet <- time_series %>%
-    filter(Population.type  == "Refugees (incl. refugee-like situations)" & !(is.na(Region.Name))) %>%
-    group_by(Year, Region.Name ) %>%
-    summarise(Value2 = sum(Value) ) 
-
-#Make plot
-facet_plot <- ggplot() +
-  geom_area(data = facet, aes(x = Year, y = Value2, fill = Region.Name)) +
-  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
-  facet_wrap( ~ Region.Name, ncol = 5) + 
-  scale_y_continuous(labels = format_si()) +
-  unhcr_style() +
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  theme(legend.position = "none",
-        axis.text.x = element_blank()) +
-  labs(title = "Africa & Asia are hosting the biggest Refugee population",
-       subtitle = "Refugee Population growth by continent, 1951-2016")
-```
-
-```{r echo=FALSE}
-ggpubr::ggarrange(left_align(facet_plot, c("subtitle", "title")), ncol = 1, nrow = 1)
-
-```
-
-## Free scales
-
-You may have noticed in the chart above that Oceania, with its relatively small population, has disappeared completely. 
-
-By default, faceting uses fixed axis scales across the small multiples. It's always best to use the same y axis scale across small multiples, to avoid misleading, but sometimes you may need to set these independently for each multiple, which we can do by adding the argument `scales = "free"`. 
-
-If you just want to free the scales for one axis set the argument to `free_x` or `free_y`. 
-
-```{r , message = FALSE, warning = FALSE}
-#Make plot
-facet_plot_free <- ggplot() +
-  geom_area(data = facet, aes(x = Year, y = Value2, fill = Region.Name)) +
-  facet_wrap(~ Region.Name, scales = "free") + 
-  unhcr_style() +
-  scale_colour_viridis_d() + ## Add color for each lines based on color-blind friendly palette
-  geom_hline(yintercept = 0, size = 1, colour = "#333333") +
-  theme(legend.position = "none",
-        axis.text.x = element_blank(),
-        axis.text.y = element_blank()) +
-  labs(title = "It's all relative",
-       subtitle = "Refugee Population growth by continent, 1951-2016")
-```
-
-```{r echo=FALSE}
-ggpubr::ggarrange(left_align(facet_plot_free, c("subtitle", "title")), ncol = 1, nrow = 1)
-
-```
 
 # Do something else entirely
 
@@ -1325,7 +1407,7 @@ bars2 <- bars +
           theme(plot.subtitle = element_text(margin = margin(b = 75)))
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bars2, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1333,7 +1415,7 @@ Hm... maybe not.
 
 ## Exporting your plot and x-axis margins
 
-You do need to think about your x-axis margin sizes when you are producing a plot that is beyond the default height in `bbplot`, which is 450px. This could be the case for example if you are creating a bar chart with lots of bars and want to make sure there is some breathing space between each bar and labels. If you do leave the margins as they are for plots with a greater height, then you could get a larger gap between the axis and your labels.
+You do need to think about your x-axis margin sizes when you are producing a plot that is beyond the default height, which is 450px. This could be the case for example if you are creating a bar chart with lots of bars and want to make sure there is some breathing space between each bar and labels. If you do leave the margins as they are for plots with a greater height, then you could get a larger gap between the axis and your labels.
 
 Here is a guide that we work to when it comes to the margins and the height of your bar chart (with coord_flip applied to it):
 
@@ -1349,11 +1431,11 @@ So what you'd need to do is add this code to your chart if for example you wante
 
 ```{r, message = FALSE, warning = FALSE}
 bar_chart_tall <- bars + 
-                  theme(axis.text.x = element_text(margin = margin(t = 7, b = 10)))
+                  theme(axis.text.x = element_text(margin = margin(t = 14, b = 10)))
 #bar_chart_tall
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(bar_chart_tall, c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
@@ -1396,7 +1478,7 @@ highlighted <- ggplot(bar_df,
                     panel.grid.major.y = element_blank()) 
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, message = FALSE, warning = FALSE}
 ggpubr::ggarrange(left_align(highlighted , c("subtitle", "title")), ncol = 1, nrow = 1)
 ```
 
