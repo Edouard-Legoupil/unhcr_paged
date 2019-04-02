@@ -145,6 +145,11 @@ pre[class] {
  /* page-break-inside: avoid; */
 }
 
+/* When highlighting is removed, wrap code */
+pre > code {
+  white-space: pre-wrap;
+}
+
 table {
   margin: auto;
   border-top: 1px solid #666;
