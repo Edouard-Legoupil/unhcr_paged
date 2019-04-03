@@ -46,7 +46,7 @@
 <div id="header" class="title-page">
 <h1 class="title">How to quickly produce statistical reports?</h1>
 <h2 class="author">The UNHCR “<em>R-Cookbook</em>”</h2>
-<h2 class="date">Version: 2019-04-02</h2>
+<h2 class="date">Version: 2019-04-03</h2>
 </div>
 </div>
 
@@ -119,7 +119,7 @@
 
 <p>This R cookbook is designed to make the process of creating publication-ready graphics and reports with UNHCR style a more <strong>reproducible process</strong>. The cookbook aims as well at making it easier for people new to R to create graphics. It implements a specific theme (using <code>ggplot2</code> R library) and report template (using <code>pagedown</code> R library).</p>
 <p>The cookbook below should hopefully help anyone who wants to make advanced graphics and gain efficiency in the generation of statistical reports. All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be re-used.</p>
-<p>The cookbook covers basic use cases. If one has to deal to with complex survey datasset, based on a population sample, we are advising to look at the dedicated package <a href="https://unhcr.github.io/koboloadeR/docs/">KoboloadeR</a>.</p>
+<p>The cookbook covers basic use cases. When dealing complex survey data set, based on a population sample where data must be weighted, we are advising to use the dedicated package <a href="https://unhcr.github.io/koboloadeR/docs/">KoboloadeR</a>.</p>
 <p>This document has been largely inspired by the <a href="https://bbc.github.io/rcookbook/">BBC cookbook</a>.</p>
 <div id="graphics-with-style" class="section level1">
 <h1><span class="header-section-number">1</span> Graphics with “<em>style</em>”</h1>
@@ -127,34 +127,34 @@
 <h2><span class="header-section-number">1.1</span> Importance of reproducibility</h2>
 <p>Reproducibility is key in data analysis:</p>
 <ul>
-<li><p>it can save a lot of time when very similar analysis have to be done in different operation or point in time,</p></li>
-<li><p>It allows to quickly to scan the analysis workflow and point potential errors,</p></li>
-<li><p>It allows for peer review and/or can help peers to learn from what is presented. Openness and transparency improves trust in results.</p></li>
+<li><p>It can save a lot of time when very similar analysis has to be done in different operations or points in time,</p></li>
+<li><p>It allows for quickly scanning the analysis workflow and point potential errors,</p></li>
+<li><p>It allows for peer review and/or can help peers to learn from what is presented. Openness and transparency improve trust in results.</p></li>
 </ul>
-<p>The entry point to analysis reproducibility is to have each step documented through scripts, rather than using <em>point and click</em> software interface. R is a very powerfull language for this:</p>
+<p>The entry point to analysis reproducibility is to have each step documented through scripts, rather than using <em>point and click</em> graphical user interface. R is a very powerful language for this:</p>
 <ol style="list-style-type: decimal">
-<li><p>It’s open source (i.e. it can be customised to accommodate specific needs) and free to use (i.e. not only saving financial resources for core humanitarian activities but also avoiding there long and cumbersome software procurement processes);</p></li>
+<li><p>It’s open source (i.e. it can be customized to accommodate specific needs) and free to use (i.e. not only saving financial resources for core humanitarian activities but also avoiding there long and cumbersome software procurement processes);</p></li>
 <li><p>It is now an industry-standard in data science and data mining (for instance it is now integrated per default in recent versions of Microsoft SQL Server,);</p></li>
 <li><p>It has a strong community, which leverages package (i.e. logic &amp; workflow) development and plenty of tutorial material and user group;</p></li>
-<li><p>It covers the entire analysis workflow: from data import, data tidying, data reshaping, visualisation with chart, modelisation and generation of report to communicate results.</p></li>
+<li><p>It covers the entire analysis workflow: from data import, data tidying, data reshaping, visualization with chart, modeling and generation of report to communicate results.</p></li>
 </ol>
 <div class="figure">
 <img src="data-science.png" alt="Diagram: Data Science Workflow" />
 <p class="caption"><strong>Diagram:</strong> Data Science Workflow</p>
 </div>
-<p>This cookbook does not aim at replacing the numerous books available on data science, like the <a href="https://r4ds.had.co.nz">R for Data Science</a>, it is rather a quick reference to be used by colleagues that aims at building skills in thhe area.</p>
+<p>This cookbook does not aim at replacing the numerous books available on data science, like the <a href="https://r4ds.had.co.nz">R for Data Science</a>, it is rather a quick reference to be used by colleagues that aims at building skills in the area.</p>
 <p>In November 2018, the first HumanitaRian-useR-group took place. An online <a href="https://join.skype.com/qYBKC5q3wKp4">skype group</a>, with over 150 members at the time of writing is openly accessible and tutorial based on humanitarian situations are published on a <a href="http://humanitarian-user-group.github.io/">blog</a>.</p>
 </div>
 <div id="chart-to-convey-stories" class="section level2">
 <h2><span class="header-section-number">1.2</span> Chart to convey “<em>stories</em>”</h2>
-<p>Effective chart are first those that <strong>support a message</strong>. From the same dataset a multiplicity of chart can be produced. The best chart is the one that present in the most powerful way the message that you want to pass-on and the story you want to tell.</p>
-<p>Simples rules can help to achived this:</p>
+<p>Effective chart are first those that <strong>support a message</strong>. From the same data set a multiplicity of chart can be produced. The best chart is the one that present in the most powerful way the message that you want to pass-on and the story you want to tell.</p>
+<p>Simple rules can help achieving this:</p>
 <ul>
 <li><p><strong>Outline the message</strong>: Always use the main conclusion you want to draw within the title of the chart, use the subtitle to present the data that you have used in the chart. annotation in the chart can also help explaining why the chart is an evidence of the message you present. The message resides in the shape of the data. Chart titles should be clear and accurate, includes time increment and units.</p></li>
-<li><p><strong>Do keep the chart as simple as possible</strong>. Edward Tufte, a statistician, said “<em>Graphical elegance is often found in simplicity of design and complexity of data.</em>” A common mistake we all make with charts is overdressing them with unnecessary elements. The usual suspects are excess color, graphical clutter and abuse of special effects. Details like these won’t impress anyone, but decluttering your charts will.</p></li>
-<li><p><strong>Focus on legibility</strong>: Graph should be designed to higlight trends, patterns and make exceptions more visible. They can also be designed to reveal relationships among multiple values. For instance, for bar graph presenting categories, do use a horizontal bar graph and arrange data from greatest to least in descending order.</p></li>
-<li><p><strong>Use color to communicate information and not for decoration</strong>. Too many colors can confuse and disorient. When designing a graph, color can be both your friend and your enemy. Depending on how we use it, it can either gracefully highlight data and show a change, or create visual overload and confuse the audience. Don’t use more than six colors or six different categories within the same chart: human brain cannot process more than this.</p></li>
-<li><p><strong>Reshape first your data</strong>: A good chart establish a balance between content &amp; message: Too many content -&gt; not legible; Not enough content -&gt; not precise. Therefore the content (i.e the data) shall be adjusted content to message. For instance, extra decimal places look impressive and imply accuracy, but they’re often pointless. So, take a step back and round numbers off before plotting. Overstating the numerical precision of your data by showing too many decimal places can make your chart seem accurate, but this specificity is just misleading. Even when you don’t exaggerate the precision of your data, and your numbers are genuinely accurate, overloading your audience with such detail is often useless</p></li>
+<li><p><strong>Do keep the chart as simple as possible</strong>. Edward Tufte, a statistician, said “<em>Graphical elegance is often found in simplicity of design and complexity of data.</em>” A common mistake we all make with charts is overdressing them with unnecessary elements. The usual suspects are excess color, graphical clutter and abuse of special effects. Details like these won’t impress anyone but de-cluttering your charts will.</p></li>
+<li><p><strong>Focus on legibility</strong>: Graph should be designed to highlight trends, patterns and make exceptions more visible. They can also be designed to reveal relationships among multiple values. For instance, for bar graph presenting categories, do use a horizontal bar graph and arrange data from greatest to least in descending order.</p></li>
+<li><p><strong>Use color to communicate information and not for decoration</strong>. Too many colors can confuse and disorient. When designing a graph, color can be both your friend and your enemy. Depending on how we use it, it can either gracefully highlight data and show changes, or create visual overload and confuse the audience. Don’t use more than six colors or six different categories within the same chart: human brain cannot process more than this.</p></li>
+<li><p><strong>Reshape first your data</strong>: A good chart establish a balance between content &amp; message: Too many content -&gt; not legible; Not enough content -&gt; not precise. Therefore, the content (i.e. the data) shall be adjusted content to message. For instance, extra decimal places look impressive and imply accuracy, but they’re often pointless. So, take a step back and round numbers off before plotting. Overstating the numerical precision of your data by showing too many decimal places can make your chart seem accurate, but this specificity is just misleading. Even when you don’t exaggerate the precision of your data, and your numbers are genuinely accurate, overloading your audience with such detail is often useless</p></li>
 </ul>
 <p>By using this cookbook, you can benefit from a simple and lean style and focus on your data, message and story-telling, rather than wasting precious time on chart beautification and report design.</p>
 </div>
@@ -164,7 +164,7 @@
 <p>We’ll get to how you can put together the various elements of these graphics, but <strong>let’s get the admin out of the way first…</strong></p>
 <div id="software-libraries" class="section level2">
 <h2><span class="header-section-number">2.1</span> Software &amp; Libraries</h2>
-<p>You will need to first install <a href="https://www.r-project.org/">R</a> and <a href="https://www.rstudio.com/products/rstudio/download/">R sudio</a>. The next step could be to download this repository and re-run the Rmd file line by line and see the results of each instructions to familiarise yourself with the code.</p>
+<p>You will need to first install <a href="https://www.r-project.org/">R</a> and <a href="https://www.rstudio.com/products/rstudio/download/">R sudio</a>. The next step could be to download this repository and re-run the Rmd file line by line and see the results of each instructions to familiarize yourself with the code.</p>
 <p>A few of the steps in this cookbook - and to create charts in R in general - require certain packages to be installed and loaded. So that you do not have to install and load them one by one, you can use the <code>using</code> function to load them all at once with the following code.</p>
 <pre class="r"><code>## Getting all necessary package
 using &lt;- function(...) {
@@ -178,8 +178,8 @@ using &lt;- function(...) {
 }
 using(&#39;tidyverse&#39;,&#39;gganimate&#39;,&#39;gghighlight&#39;,&#39;ggpubr&#39;, &#39;dplyr&#39;, &#39;tidyr&#39;, &#39;gapminder&#39;, &#39;ggplot2&#39;,  &#39;ggalt&#39;, &#39;forcats&#39;, &#39;R.utils&#39;, &#39;png&#39;, &#39;grid&#39;, &#39;ggpubr&#39;, &#39;scales&#39;, &#39;bbplot&#39;, &#39;markdown&#39;, &#39;pander&#39;, &#39;ISOcodes&#39;, &#39;wbstats&#39;, &#39;sf&#39;, &#39;rnaturalearth&#39;, &#39;rnaturalearthdata&#39;, &#39;ggspatial&#39;)</code></pre>
 <p>All graphics in the cookbook are created with the library <code>ggplot2</code>. Without going into too much details, the main concept behind this package is called the <strong>grammar of graphics</strong>. It’s a very powerful abstraction to describe any kind of plots using a limited number of instructions.</p>
-<p>The idea is that you can build every graph from the same few components: a dataset (<strong>data</strong>), a set of geometry (<strong>geom</strong> : visual marks that represents data points: bar, line, point, area, polygon, etc.) and a coordinate system (<strong>coord</strong>). To display data values, variables in the dataset shall be mapped to aesthetic properties of the geom (<strong>aes</strong>: like size, color and x and y locations). In addition, some plots visualise a transformation of the original variable that is described by the instruction <strong>stat</strong>.</p>
-<p>Using scripts can appear difficult at the begining but with a bit of practice, it provides huge gain of productivity compared to point and click interactions.</p>
+<p>The idea is that you can build every graph from the same few components: a data set (<strong>data</strong>), a set of geometry (<strong>geom</strong> : visual marks that represents data points: bar, line, point, area, polygon, etc.) and a coordinate system (<strong>coord</strong>). To display data values, variables in the data set shall be mapped to aesthetic properties of the geom (<strong>aes</strong>: like size, color and x and y locations). In addition, some plots visualize a transformation of the original variable that is described by the instruction <strong>stat</strong>.</p>
+<p>Using scripts can appear difficult at the beginning but with a bit of practice, it provides huge gain of productivity compared to point and click interactions.</p>
 <p>UNHCR style is delivered through the function: <code>unhcr_style()</code>. This function essentially modifies certain arguments in the <code>theme</code> function of <code>ggplot2</code>.</p>
 <pre class="r"><code>unhcr_style &lt;- function() {
   font &lt;- &quot;Lato&quot;
@@ -220,13 +220,13 @@ using(&#39;tidyverse&#39;,&#39;gganimate&#39;,&#39;gghighlight&#39;,&#39;ggpubr&
   strip.text = ggplot2::element_text(size  = 13,  hjust = 0)
   )
 }</code></pre>
-<p><code>unhcr_style()</code>: has no arguments and is added to the ggplot ‘chain’ after you have created a plot. What it does is generally makes text size, font and colour, axis lines, axis text, margins and many other standard chart components into UNHCR style, which has been formulated based on recommendations and feedback from the design team.</p>
-<p>Note that colours for lines in the case of a line chart or bars for a bar chart, do not come out of the box from the <code>unhcr_style()</code> function, but need to be explicitly set in your other standard <code>ggplot</code> chart functions.</p>
+<p><code>unhcr_style()</code>: has no arguments and is added to the ggplot ‘chain’ after you have created a plot. What it does is generally makes text size, font and color, axis lines, axis text, margins and many other standard chart components into UNHCR style, which has been formulated based on recommendations and feedback from the design team.</p>
+<p>Note that colors for lines in the case of a line chart or bars for a bar chart, do not come out of the box from the <code>unhcr_style()</code> function, but need to be explicitly set in your other standard <code>ggplot</code> chart functions.</p>
 <p>You can modify these settings for your chart, or add additional theme arguments, by calling the <code>theme</code> function with the arguments you want - but please note that for it to work you must call it <em>after</em> you have called the <code>unhcr_style</code> function. Otherwise <code>unhcr_style()</code> will override it.</p>
-<p>The following for instance will add some gridlines, by adding extra theme arguments to what is included in the <code>unhcr_style()</code> function. There are many similar examples throughout the cookbook.</p>
+<p>The following for instance will add some grid lines, by adding extra theme arguments to what is included in the <code>unhcr_style()</code> function. There are many similar examples throughout the cookbook.</p>
 <pre class="r"><code>theme(panel.grid.major.x = element_line(color = &quot;#cbcbcb&quot;), 
         panel.grid.major.y = element_blank())</code></pre>
-<p>A specific statement is used to aligne the chart, it’s title, subtitle and source</p>
+<p>A specific statement is used to align the chart, it’s title, subtitle and source</p>
 <p><code>ggpubr::ggarrange(left_align(line, c(&quot;subtitle&quot;, &quot;title&quot;)), ncol = 1, nrow = 1)</code></p>
 <p>It use a specific function <code>left_align()</code>:</p>
 <pre class="r"><code>#Left align text
@@ -236,7 +236,7 @@ left_align &lt;- function(plot_name, pieces){
   grob$layout$l[grob$layout$name %in% pieces] &lt;- 2
   return(grob)
 }</code></pre>
-<p>Anotherfunction, <code>format_si()</code>, can be also installed to nicely format numbers</p>
+<p>Another function, <code>format_si()</code>, can be also installed to format numbers on axis.</p>
 <pre class="r"><code>## a little help function to better format numbers
 format_si &lt;- function(...) {
   function(x) {
@@ -273,7 +273,7 @@ format_si &lt;- function(...) {
 <div id="prepare-some-data" class="section level2">
 <h2><span class="header-section-number">2.3</span> Prepare some data</h2>
 <p>This cookbook is based on real UNHCR data.</p>
-<p>Last Let’s now download (&amp; slighlty tidy) data from UNHCR popstat API together with indicators from the worldbank and some geodata.</p>
+<p>Last Let’s now download (&amp; slightly tidy) data from UNHCR popstat API together with indicators from the World Bank and some geodata.</p>
 <pre class="r"><code># Time series
 url &lt;- paste( &#39;http://popstats.unhcr.org/en/time_series.csv&#39;) 
 download.file(url, destfile = &quot;unhcr_popstats_export_time_series_all_data.csv&quot; )
@@ -354,12 +354,12 @@ world_points &lt;- cbind(world, st_coordinates(centroids))</code></pre>
 <li><p>The purpose of the line chart is to show a trend. It is often the best solution when the data presents a time series referring to a single value that changes at regular intervals.</p></li>
 <li><p>Choose the y-axis scale appropriately so that we can see the trend. Too flat obscures the message and too exaggerated overstates the trend. The right height is two-thirds of the chart area.</p></li>
 <li><p>The weight of the fever line should be thick enough to stand out against the grid line but still thin enough to show the twists and turns of the line. Keep the grid lines thin.</p></li>
-<li>Unlike a bar chart, a fever line does not necessarily require a zero baseline. Some data trend won’t be discernible starting from zero baseline.</li>
-<li><p>Avoid labeling at long distance, a legend separated from the line requires the readers to do extra work cross-referencing between the key and the line. Label the lines directly. Direct labelling allows the reader to identify the lines quickly and focus on comparing and contrasting the patterns.</p></li>
+<li><p>Unlike a bar chart, a fever line does not necessarily require a zero baseline. Some data trend won’t be discernible starting from zero baseline.</p></li>
+<li><p>Avoid labeling at long distance, a legend separated from the line requires the readers to do extra work cross-referencing between the key and the line. Label the lines directly. Direct labeling allows the reader to identify the lines quickly and focus on comparing and contrasting the patterns.</p></li>
 <li><p>Use the legend only when the space is tight and the lines intersect extensively. The order of the legend should match the ranking of the end points since they are the most current data points.</p></li>
 <li><p>Annotations help to clarify the message.</p></li>
 </ul>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>#Prepare data
 line_df &lt;- time_series2 %&gt;%
   filter(Population.type  == &quot;Refugees (incl. refugee-like situations)&quot;) %&gt;%
@@ -386,9 +386,9 @@ line &lt;- ggplot(line_df, aes(x = Year, y = Value2)) +
 <ul>
 <li><p>Don’t use dashed lines and shape markers to differentiate each line! You can use solid lines exclusively by limiting the chart to four or fewer lines. Varying weights and shades do the work of differentiating the lines more effectively than distracting patterns and markers.</p></li>
 <li><p>In a single chart, keep the maximum number of lines to three or possibly four if the lines are not intersecting at many points. The purpose of a multiple-line chart is to compare and contrast different data series.</p></li>
-<li><p>The most important line should be one colour and the other lines should be shades of second colour.</p></li>
+<li><p>The most important line should be one color and the other lines should be shades of second colors.</p></li>
 </ul>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>#Prepare data
 multiple_line_df &lt;- time_series %&gt;%
   filter(Population.type  == &quot;Refugees (incl. refugee-like situations)&quot; &amp; !(is.na(Region.Name))) %&gt;%
@@ -418,18 +418,18 @@ multiple_line &lt;- ggplot(multiple_line_df, aes(x = Year, y = Value2,
 <li><p>Ensure numerical axis labels are aligned to the decimal point;</p></li>
 <li><p>Clearly denote currency or units;</p></li>
 <li><p>When axis lines are present, it is not necessary to label each data value. However, it can be useful to highlight the final value or other important data points.</p></li>
-<li><p>Convert your data to rounded, easily digestible values for chart labelling</p></li>
+<li><p>Convert your data to rounded, easily digestible values for chart labeling</p></li>
 <li><p>Omit axes and baselines when data values are labeled, simpler, better!</p></li>
 <li><p>When the range of your data crosses natural numerical milestones, such as from millions to billions, set the entire chart in the larger milestone. A chart should never reflect more than 1,000 millions. etc.</p></li>
 <li><p>Ensure labels fit neatly under the bars in no more than two lines.</p></li>
-<li><p>Don’t use 3D effect!</p></li>
 <li><p>Horizontal bar charts help compare long lists of values or categories. It has the advantage of printing long labels without using two lines or printing vertical text, as would be required for a vertical bar.</p></li>
 <li><p>Remember to sort your data before charting so that readers can easily compare.</p></li>
 <li><p>Labeled values eliminate the need for grid lines, while rounding is done to make the values easy to digest.</p></li>
+<li><p>Don’t use 3D effect!</p></li>
 </ul>
 <p>Note that by default, R will display your data in alphabetical order, but arranging it by size instead is simple: just wrap <code>reorder()</code> around the <code>x</code> or <code>y</code> variable you want to rearrange, and specify which variable you want to reorder it by.</p>
 <p>E.g. <code>x = reorder(Country, Value2)</code>. Ascending order is the default, but you can change it to descending by wrapping <code>desc()</code> around the variable you’re ordering by.</p>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>#Prepare data
 bar_df &lt;- time_series %&gt;%
   filter(Population.type  == &quot;Refugees (incl. refugee-like situations)&quot; &amp; Year == 2016) %&gt;%
@@ -459,13 +459,12 @@ bars &lt;- ggplot(bar_df, aes(x = reorder(Country, Value2), ## Reordering countr
 </div>
 <div id="stacked-bar-chart" class="section level2">
 <h2><span class="header-section-number">3.4</span> Stacked bar chart</h2>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>#prepare data
 df1 &lt;- time_series %&gt;%
   filter(Population.type  == &quot;Refugees (incl. refugee-like situations)&quot; &amp; Year == 2016 &amp; !(is.na(Region.Name))) %&gt;%
   group_by(Year, Country, ISO3166.1.Alpha.3 ) %&gt;%
   summarise(Value2 = sum(Value) )
-
 
 df2 &lt;- merge(x = df1, y = wb_data, by = c(&quot;ISO3166.1.Alpha.3&quot; ,&quot;Year&quot;), all.x = TRUE)
 df2 &lt;- merge(x = df2, y = countrycode[ ,c(&quot;ISO3166.1.Alpha.3&quot;, &quot;Region.Name&quot;)], by = &quot;ISO3166.1.Alpha.3&quot; , all.x = TRUE)
@@ -506,7 +505,7 @@ stacked_bars &lt;- ggplot(data = stacked_df1,
 <h2><span class="header-section-number">3.5</span> Grouped bar chart</h2>
 <p>Making a grouped bar chart is very similar to making a bar chart.</p>
 <p>You just need to change <code>position = &quot;identity&quot;</code> to <code>position = &quot;dodge&quot;</code>, and set the <code>fill</code> aesthetically instead:</p>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>#Prepare data
 grouped_bar_df &lt;- time_series %&gt;%
     filter(Population.type  == &quot;Refugees (incl. refugee-like situations)&quot;)  %&gt;%
@@ -545,8 +544,9 @@ grouped_bars &lt;- ggplot(grouped_bar_df,
 </div>
 <div id="dumbbell-chart" class="section level2">
 <h2><span class="header-section-number">3.6</span> Dumbbell chart</h2>
-<p>Another way of showing difference is a dumbbell chart:</p>
-<p>Let’s see what code is required for such chart:</p>
+<p>Dumbbell plot (also known as Dumbbell chart, Connected dot plot) is great for displaying changes between two points in time, two conditions or differences between two groups.
+Another way of showing difference is a dumbbell chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>library(&quot;ggalt&quot;)
 library(&quot;tidyr&quot;)
 
@@ -586,11 +586,11 @@ dumbell &lt;- ggplot(dumbbell_df, aes(x = `2006`, xend = `2016`,
 <p>A histogram is <strong>not</strong> a bar chart: histograms are used to show distributions (or the shape) of variables while bar charts are used to compare variables.</p>
 <p>Some data sets have a distinct shape. Data hardly ever fall into perfect patterns, so you have to decide whether the data shape. The two interpretation key are the following:</p>
 <ul>
-<li><p>Symmetric bell shape: if you cut it down the middle and the left-hand and right-hand sides resemble mirror images of each other. The middle of the chart is the place when the largest occurence appears: in this case, we have something closed to a normal distribution. <strong>Kurtosis</strong> is a measure of whether the data are heavy-tailed or light-tailed relative to a normal distribution. That is, data sets with high kurtosis tend to have heavy tails, or outliers. Data sets with low kurtosis tend to have light tails, or lack of outliers.</p></li>
+<li><p>Symmetric bell shape: if you cut it down the middle and the left-hand and right-hand sides resemble mirror images of each other. The middle of the chart is the place when the largest occurrence appears: in this case, we have something closed to a normal distribution. <strong>Kurtosis</strong> is a measure of whether the data are heavy-tailed or light-tailed relative to a normal distribution. That is, data sets with high kurtosis tend to have heavy tails, or outliers. Data sets with low kurtosis tend to have light tails, or lack of outliers.</p></li>
 <li><p>Skewed right or left:looks like a lopsided mound, with a tail going off to the right or left. <strong>Skewness</strong> is a measure of symmetry, or more precisely, the lack of symmetry. A distribution, or data set, is symmetric if it looks the same to the left and right of the center point.</p></li>
 </ul>
 <p>A uniform distribution would be the extreme case.</p>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code># Prepare Data
  hist_df &lt;-  df2 %&gt;%
     mutate(ref.per.local = (Value2 / SP.POP.TOTL) * 100) %&gt;%
@@ -612,9 +612,9 @@ histo &lt;-  ggplot(hist_df, aes(ref.per.local)) +
 </div>
 <div id="scatterplot" class="section level2">
 <h2><span class="header-section-number">3.8</span> Scatterplot</h2>
-<p>Scatterplot are used to check for correlation. A trend line can be added to compare two set of measures to determine if as one set goes up, the other set correspondingly goes up or down and how strongly.</p>
-<p>Scatterplot are also a good way to identify clusters of observation.</p>
-<p>Let’s see what code is required for such chart:</p>
+<p>Scatter plot are used to check for correlation. A trend line can be added to compare two set of measures to determine if as one set goes up, the other set correspondingly goes up or down and how strongly.</p>
+<p>Scatter plot are also a good way to identify clusters of observation.</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code>## Chart
 scatter &lt;- ggplot(df2, aes(y = Value2, x = NY.GDP.MKTP.CD)) + 
   geom_point(aes(col = Region.Name)) + 
@@ -641,7 +641,7 @@ scatter &lt;- ggplot(df2, aes(y = Value2, x = NY.GDP.MKTP.CD)) +
 <li>Absolute value: Proportional symbol</li>
 <li>Relative value (ratio): Choropleth</li>
 </ol>
-<p>Let’s see what code is required for such chart:</p>
+<p><strong>Let’s see what code is required for such chart: </strong></p>
 <pre class="r"><code># Merge data with geographic coordinates
 world &lt;- merge(x = world , y = df2, by.y = &quot;ISO3166.1.Alpha.3&quot; , by.x = &quot;iso_a3&quot;)
 df3 &lt;- merge(x = df2 , y = world_points, by.x = &quot;ISO3166.1.Alpha.3&quot; , by.y = &quot;iso_a3&quot;)
@@ -678,7 +678,7 @@ map &lt;- ggplot(data = world) +
 <ul>
 <li>With four or more data series, an array of individual charts can display a pattern and allows better comparison among all lines.</li>
 </ul>
-<p>If you have data that you want to visualise split up by some variable, you need to use <code>facet_wrap</code> or <code>facet_grid</code>.</p>
+<p>If you have data that you want to visualize split up by some variable, you need to use <code>facet_wrap</code> or <code>facet_grid</code>.</p>
 <p>Add the variable you want to divide by to this line of code: <code>facet_wrap( ~ variable)</code>.</p>
 <p>An additional argument to facet wrap, <code>ncol</code>, allows you to specify the number of columns:</p>
 <pre class="r"><code>#Prepare data
@@ -741,7 +741,7 @@ facet_plot_free &lt;- ggplot() +
 <p><img src="index_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p>To be really precise about where we want our legend to go, instead of specifying “right” or “top” to change the general position of where the legend appears in our chart, we can give it specific coordinates.</p>
 <p>For example <code>legend.position=c(0.98,0.1)</code> will move the legend to the bottom right. For reference, c(0,0) is bottom left, c(1,0) is bottom right, c(0,1) is top left and so on). Finding the exact position may involve some trial and error.</p>
-<p>To check the exact position where the legend appears in your finalised plot you will have to check the file that is saved out after you run your <code>finalise_plot()</code> function, as the position will be relevant to the dimensions of the plot.</p>
+<p>To check the exact position where the legend appears in your finalized plot you will have to check the file that is saved out after you run your <code>finalise_plot()</code> function, as the position will be relevant to the dimensions of the plot.</p>
 <pre class="r"><code>multiple_line2 &lt;- multiple_line + 
                   theme(legend.position = c(0.1,0.5),
                       legend.direction = &quot;vertical&quot;) +  
@@ -797,7 +797,7 @@ facet_plot_free &lt;- ggplot() +
 <h2><span class="header-section-number">5.7</span> Add space between your legend labels</h2>
 <p>The default ggplot legend has almost no space between individual legend items. Not ideal.</p>
 <p>You can add space by changing the scale labels manually.</p>
-<p>For instance, if you have set the colour of your geoms to be dependent on your data, you will get a legend for the colour, and you can tweak the exact labels to get some extra space in by using the below snippet:</p>
+<p>For instance, if you have set the color of your geoms to be dependent on your data, you will get a legend for the color, and you can tweak the exact labels to get some extra space in by using the below snippet:</p>
 <pre class="r"><code># multiple_line2 &lt;- multiple_line +
 #                  scale_colour_manual(labels = function(x) paste0(&quot; &quot;, x))</code></pre>
 <p>generate this chart:</p>
@@ -809,7 +809,7 @@ facet_plot_free &lt;- ggplot() +
 <h1><span class="header-section-number">6</span> Make changes to the axes</h1>
 <div id="addremove-gridlines" class="section level2">
 <h2><span class="header-section-number">6.1</span> Add/remove gridlines</h2>
-<p>The theme only has gridlines: remove the gridlines on the y axis with <code>panel.grid.major.y = element_blank()</code>)</p>
+<p>The theme only has grid lines: remove the grid lines on the y axis with <code>panel.grid.major.y = element_blank()</code>)</p>
 <pre class="r"><code>bars2 &lt;- bars + 
   theme(panel.grid.major.x = element_blank())</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
@@ -855,7 +855,7 @@ facet_plot_free &lt;- ggplot() +
 </div>
 <div id="modify-axis-titles" class="section level2">
 <h2><span class="header-section-number">6.7</span> Modify axis titles</h2>
-<p>If you add in axis titles, they will by default be the column names in your dataset. You can change this to anything you want in your call to <code>labs()</code>.</p>
+<p>If you add in axis titles, they will by default be the column names in your data set. You can change this to anything you want in your call to <code>labs()</code>.</p>
 <p>For instance, if you wish your x axis title to be “I’m an axis” and your y axis label to be blank, this would be the format:</p>
 <pre class="r"><code>bars3 &lt;- bars2 +
          labs(x = &quot;Country&quot;,  y = &quot;Population&quot;)</code></pre>
@@ -1019,7 +1019,7 @@ facet_plot_free &lt;- ggplot() +
 <div id="add-a-line-across-the-whole-plot" class="section level2">
 <h2><span class="header-section-number">7.8</span> Add a line across the whole plot</h2>
 <p>The easiest way to add a line across the whole plot is with <code>geom_vline()</code>, for a vertical line, or <code>geom_hline()</code>, for a horizontal one.</p>
-<p>Optional additional arguments allow you to specify the size, colour and type of line (the default option is a solid one).</p>
+<p>Optional additional arguments allow you to specify the size, color and type of line (the default option is a solid one).</p>
 <pre class="r"><code>multiple_line2 &lt;- multiple_line + 
                   geom_hline(yintercept = 10000000, size = 1, colour = &quot;red&quot;, linetype = &quot;dashed&quot;)</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-81-1.png" width="672" /></p>
