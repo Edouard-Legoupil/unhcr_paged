@@ -11,8 +11,8 @@ output:
     toc-title: Contents
     paged-footnotes: true
     css:
-    - css/unhcr.css
     - css/unhcr-page.css
+    - css/unhcr.css
     - css/unhcr-fonts.css   
 ---
 

@@ -8,26 +8,8 @@
   --screen-pages-spacing: 5mm;
 }
 
-/* generated content */
-a[href^="http"]:not([class="uri"])::after {
-  content: " (" attr(href) ")";
-  font-size: 90%;
-  hyphens: none;
-  word-break: break-all;
-}
-.references a[href^=http]:not([class=uri])::after {
-  content: none;
-}
-.main a[href^="#"]:not([class^="footnote-"]):not([href*=":"])::after {
-  content: " (page " target-counter(attr(href), page) ")";
-}
-.main a.front-matter-ref[href^="#"]:not([class^="footnote-"]):not([href*=":"])::after {
-  content: " (page " target-counter(attr(href), page, lower-roman) ")";
-}
 
 /* TOC, LOT, LOF */
-
-
 .toc {
     page-break-before: right;
     page: toc;
