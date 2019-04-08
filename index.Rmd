@@ -6,7 +6,7 @@ output:
   pagedown::html_paged:
     toc: true
     # change to true for a self-contained document, but it'll be a litte slower for Pandoc to render
-    self_contained: false
+    self_contained: true
     highlight: null
     toc-title: Contents
     paged-footnotes: true
