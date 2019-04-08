@@ -11,10 +11,11 @@ output:
     toc-title: Contents
     paged-footnotes: true
     css:
-    - css/unhcr_page_custom.css
-    - css/unhcr_page.css
-    - css/unhcr_page_fonts.css   
+    - css/unhcr.css
+    - css/unhcr-page.css
+    - css/unhcr-fonts.css   
 ---
+
 
 
 ```{r setup, include=FALSE, echo=TRUE, warning=FALSE}
@@ -34,9 +35,9 @@ options(scipen = 999) # turn-off scientific notation like 1e+48
 ```
 
 
-This R cookbook is designed to make the process of creating publication-ready graphics and reports with UNHCR style a more __reproducible process__. The cookbook aims as well at making it easier for people new to R to create graphics. It implements a specific theme (using `ggplot2` R library) and report template (using `pagedown`  R library). 
+The cookbook aims as well at making it easier for people new to R to create graphics. It implements a specific theme (using `ggplot2` R library) and report template (using `pagedown`  R library). 
 
-The cookbook below should hopefully help anyone who wants to make advanced graphics and gain efficiency in the generation of statistical reports. All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be re-used. 
+All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be re-used. 
 
 The cookbook covers basic use cases. When dealing complex survey data set, based on a population sample where data must be weighted, we are advising to use the dedicated package [KoboloadeR](https://unhcr.github.io/koboloadeR/docs/).
 
@@ -45,6 +46,15 @@ This document has been largely inspired by the [BBC cookbook](https://bbc.github
 
 
 # Graphics with "_style_"
+
+## A report or a dashbaord?
+
+Often analysts start building a dashboard when dealing with a new dataset. This is a correct approach only under certain conditions.
+
+A dashboard is a one-screen group of summary visualizations that facilitate rapid assessment of a system (the best example for this being a car dashboard when the driver can monitor speed, heat, fuel, etc.). It displays the most important information needed to achieve one ore more objectives, consolidated and arranged in a format so that the information can be monitored at a glance. A report, by contrast, is an ordered presentation of a detailed data set. Reports are usually longer and more detailed, although they may have summary components.
+
+In short, dashboards tend to focus on Key Performance Indicators (KPIs), while reports tend to focus on underlying data. Dashboards communicate specific points, while reports are aiming at telling a story. Statistical reports are therefore the starting point for any data analysis: this is the format to use to develop narrative interpretation for existing data in order to __develop knowledge__. It's only once the knowledge and interpretation keys on a specific data set is developped that end-users will be able to make sense of a dashboard presenting the same kind of data.
+
 
 ## Importance of reproducibility
 
@@ -60,7 +70,7 @@ Reproducibility is key in data analysis:
 
  1. It’s open source (i.e. it can be customized to accommodate specific needs) and free to use (i.e. not only saving financial resources for core humanitarian activities but also avoiding there long and cumbersome software procurement processes);
 
- 2. It is now an industry-standard in data science and data mining (for instance it is now integrated per default in recent versions of Microsoft SQL Server,);
+ 2. It is now an industry-standard in data science and data mining (for instance it is now integrated per default in recent versions of Microsoft SQL Server);
 
  3. It has a strong community, which leverages package (i.e. logic & workflow) development and plenty of tutorial material and user group;
  
@@ -245,7 +255,12 @@ An R Markdown document can be then rendered into the final output format (for in
 
 This package requires a recent version of Pandoc (>= 2.2.3). If you use RStudio, you are recommended to install the Preview version (>= 1.2.1070), which has bundled Pandoc 2.x, otherwise you need to install Pandoc separately.
 
-A dedicated template - used in this document - allows to implement quickly and directly UNHCR branding.
+
+This template demonstrates some of the basic [markdown]{.proglang} you'll need to know to create a UNHCR Statistical report **pagedown** [@R-pagedown].
+
+If you use the option `self_contained: false` (see line \#22 of this `Rmd` file), don't click on the `Knit` button in RStudio. Use instead the **xaringan** [@R-xaringan] RStudio add-in _Infinite Moon Reader_.
+
+
 
 ## Prepare some data 
 
@@ -1479,3 +1494,10 @@ ggpubr::ggarrange(left_align(highlighted , c("subtitle", "title")), ncol = 1, nr
 
 # Conclusion
 
+
+
+# References {-}
+
+```{r, include=FALSE}
+knitr::write_bib(c(.packages(), 'pagedown', 'xaringan'), 'index.bib')
+```

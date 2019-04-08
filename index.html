@@ -21,16 +21,16 @@
 <title>How to quickly produce statistical reports?</title>
 
 
-<script src="index_files/paged-0.2.3/js/config.js"></script>
-<script src="index_files/paged-0.2.3/js/paged.js"></script>
-<script src="index_files/paged-0.2.3/js/hooks.js"></script>
+<script src="index_files/paged-0.2.4/js/config.js"></script>
+<script src="index_files/paged-0.2.4/js/paged.js"></script>
+<script src="index_files/paged-0.2.4/js/hooks.js"></script>
 
 
 
 
-<link rel="stylesheet" href="css/unhcr_page_custom.css" type="text/css" />
-<link rel="stylesheet" href="css/unhcr_page.css" type="text/css" />
-<link rel="stylesheet" href="css/unhcr_page_fonts.css" type="text/css" />
+<link rel="stylesheet" href="css/unhcr.css" type="text/css" />
+<link rel="stylesheet" href="css/unhcr-page.css" type="text/css" />
+<link rel="stylesheet" href="css/unhcr-fonts.css" type="text/css" />
 
 </head>
 
@@ -46,7 +46,7 @@
 <div id="header" class="title-page">
 <h1 class="title">How to quickly produce statistical reports?</h1>
 <h2 class="author">The UNHCR “<em>R-Cookbook</em>”</h2>
-<h2 class="date">Version: 2019-04-03</h2>
+<h2 class="date">Version: 2019-04-08</h2>
 </div>
 </div>
 
@@ -54,8 +54,9 @@
 <div id="TOC" class="level1 toc front-matter">
 <ul>
 <li><a href="#graphics-with-style"><span class="toc-section-number">1</span> Graphics with “<em>style</em>”</a><ul>
-<li><a href="#importance-of-reproducibility"><span class="toc-section-number">1.1</span> Importance of reproducibility</a></li>
-<li><a href="#chart-to-convey-stories"><span class="toc-section-number">1.2</span> Chart to convey “<em>stories</em>”</a></li>
+<li><a href="#a-report-or-a-dashbaord"><span class="toc-section-number">1.1</span> A report or a dashbaord?</a></li>
+<li><a href="#importance-of-reproducibility"><span class="toc-section-number">1.2</span> Importance of reproducibility</a></li>
+<li><a href="#chart-to-convey-stories"><span class="toc-section-number">1.3</span> Chart to convey “<em>stories</em>”</a></li>
 </ul></li>
 <li><a href="#set-up-your-environment"><span class="toc-section-number">2</span> Set up your environment</a><ul>
 <li><a href="#software-libraries"><span class="toc-section-number">2.1</span> Software &amp; Libraries</a></li>
@@ -113,18 +114,25 @@
 <li><a href="#colour-bars-conditionally"><span class="toc-section-number">8.4</span> Colour bars conditionally</a></li>
 </ul></li>
 <li><a href="#conclusion"><span class="toc-section-number">9</span> Conclusion</a></li>
+<li><a href="#references">References</a></li>
 </ul>
 </div>
 </div>
 
-<p>This R cookbook is designed to make the process of creating publication-ready graphics and reports with UNHCR style a more <strong>reproducible process</strong>. The cookbook aims as well at making it easier for people new to R to create graphics. It implements a specific theme (using <code>ggplot2</code> R library) and report template (using <code>pagedown</code> R library).</p>
-<p>The cookbook below should hopefully help anyone who wants to make advanced graphics and gain efficiency in the generation of statistical reports. All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be re-used.</p>
+<p>The cookbook aims as well at making it easier for people new to R to create graphics. It implements a specific theme (using <code>ggplot2</code> R library) and report template (using <code>pagedown</code> R library).</p>
+<p>All the code below is ready to be copy pasted. This report template itself, as it comes with UNHCR branding style, can also easily be re-used.</p>
 <p>The cookbook covers basic use cases. When dealing complex survey data set, based on a population sample where data must be weighted, we are advising to use the dedicated package <a href="https://unhcr.github.io/koboloadeR/docs/">KoboloadeR</a>.</p>
 <p>This document has been largely inspired by the <a href="https://bbc.github.io/rcookbook/">BBC cookbook</a>.</p>
 <div id="graphics-with-style" class="section level1">
 <h1><span class="header-section-number">1</span> Graphics with “<em>style</em>”</h1>
+<div id="a-report-or-a-dashbaord" class="section level2">
+<h2><span class="header-section-number">1.1</span> A report or a dashbaord?</h2>
+<p>Often analysts start building a dashboard when dealing with a new dataset. This is a correct approach only under certain conditions.</p>
+<p>A dashboard is a one-screen group of summary visualizations that facilitate rapid assessment of a system (the best example for this being a car dashboard when the driver can monitor speed, heat, fuel, etc.). It displays the most important information needed to achieve one ore more objectives, consolidated and arranged in a format so that the information can be monitored at a glance. A report, by contrast, is an ordered presentation of a detailed data set. Reports are usually longer and more detailed, although they may have summary components.</p>
+<p>In short, dashboards tend to focus on Key Performance Indicators (KPIs), while reports tend to focus on underlying data. Dashboards communicate specific points, while reports are aiming at telling a story. Statistical reports are therefore the starting point for any data analysis: this is the format to use to develop narrative interpretation for existing data in order to <strong>develop knowledge</strong>. It’s only once the knowledge and interpretation keys on a specific data set is developped that end-users will be able to make sense of a dashboard presenting the same kind of data.</p>
+</div>
 <div id="importance-of-reproducibility" class="section level2">
-<h2><span class="header-section-number">1.1</span> Importance of reproducibility</h2>
+<h2><span class="header-section-number">1.2</span> Importance of reproducibility</h2>
 <p>Reproducibility is key in data analysis:</p>
 <ul>
 <li><p>It can save a lot of time when very similar analysis has to be done in different operations or points in time,</p></li>
@@ -134,7 +142,7 @@
 <p>The entry point to analysis reproducibility is to have each step documented through scripts, rather than using <em>point and click</em> graphical user interface. R is a very powerful language for this:</p>
 <ol style="list-style-type: decimal">
 <li><p>It’s open source (i.e. it can be customized to accommodate specific needs) and free to use (i.e. not only saving financial resources for core humanitarian activities but also avoiding there long and cumbersome software procurement processes);</p></li>
-<li><p>It is now an industry-standard in data science and data mining (for instance it is now integrated per default in recent versions of Microsoft SQL Server,);</p></li>
+<li><p>It is now an industry-standard in data science and data mining (for instance it is now integrated per default in recent versions of Microsoft SQL Server);</p></li>
 <li><p>It has a strong community, which leverages package (i.e. logic &amp; workflow) development and plenty of tutorial material and user group;</p></li>
 <li><p>It covers the entire analysis workflow: from data import, data tidying, data reshaping, visualization with chart, modeling and generation of report to communicate results.</p></li>
 </ol>
@@ -146,7 +154,7 @@
 <p>In November 2018, the first HumanitaRian-useR-group took place. An online <a href="https://join.skype.com/qYBKC5q3wKp4">skype group</a>, with over 150 members at the time of writing is openly accessible and tutorial based on humanitarian situations are published on a <a href="http://humanitarian-user-group.github.io/">blog</a>.</p>
 </div>
 <div id="chart-to-convey-stories" class="section level2">
-<h2><span class="header-section-number">1.2</span> Chart to convey “<em>stories</em>”</h2>
+<h2><span class="header-section-number">1.3</span> Chart to convey “<em>stories</em>”</h2>
 <p>Effective chart are first those that <strong>support a message</strong>. From the same data set a multiplicity of chart can be produced. The best chart is the one that present in the most powerful way the message that you want to pass-on and the story you want to tell.</p>
 <p>Simple rules can help achieving this:</p>
 <ul>
@@ -268,7 +276,8 @@ format_si &lt;- function(...) {
 <p>An R Markdown document can be then rendered into the final output format (for instance HTML, but also directly into word or PDF). R Markdown documents contains a metadata section that includes title, author, and date information as well as options for customizing output.</p>
 <p><a href="https://github.com/rstudio/pagedown">Pagedown</a> is a package that allows to transform an R Markdown file into an htlm files, directly paginated (with CSS for Print) to be saved as PDF. With Pagedown, you only need a modern web browser (e.g., Google Chrome) to generate PDF.</p>
 <p>This package requires a recent version of Pandoc (&gt;= 2.2.3). If you use RStudio, you are recommended to install the Preview version (&gt;= 1.2.1070), which has bundled Pandoc 2.x, otherwise you need to install Pandoc separately.</p>
-<p>A dedicated template - used in this document - allows to implement quickly and directly UNHCR branding.</p>
+<p>This template demonstrates some of the basic <span class="proglang">markdown</span> you’ll need to know to create a UNHCR Statistical report <strong>pagedown</strong> <span class="citation">[@R-pagedown]</span>.</p>
+<p>If you use the option <code>self_contained: false</code> (see line #22 of this <code>Rmd</code> file), don’t click on the <code>Knit</code> button in RStudio. Use instead the <strong>xaringan</strong> <span class="citation">[@R-xaringan]</span> RStudio add-in <em>Infinite Moon Reader</em>.</p>
 </div>
 <div id="prepare-some-data" class="section level2">
 <h2><span class="header-section-number">2.3</span> Prepare some data</h2>
@@ -1113,6 +1122,9 @@ facet_plot_free &lt;- ggplot() +
 </div>
 <div id="conclusion" class="section level1">
 <h1><span class="header-section-number">9</span> Conclusion</h1>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
 </div>
 
 
